@@ -1,0 +1,17 @@
+[
+  { "id": "pecho-1", "nombre": "Press de banca", "categoria": "pecho" },
+  { "id": "pecho-2", "nombre": "Press inclinado con mancuernas", "categoria": "pecho" },
+  { "id": "pecho-3", "nombre": "Aperturas en polea", "categoria": "pecho" },
+  { "id": "espalda-1", "nombre": "Dominadas", "categoria": "espalda" },
+  { "id": "espalda-2", "nombre": "Remo con barra", "categoria": "espalda" },
+  { "id": "espalda-3", "nombre": "Jalón al pecho", "categoria": "espalda" },
+  { "id": "hombros-1", "nombre": "Press militar", "categoria": "hombros" },
+  { "id": "hombros-2", "nombre": "Elevaciones laterales", "categoria": "hombros" },
+  { "id": "hombros-3", "nombre": "Pájaros", "categoria": "hombros" },
+  { "id": "brazos-1", "nombre": "Curl con barra", "categoria": "brazos" },
+  { "id": "brazos-2", "nombre": "Press francés", "categoria": "brazos" },
+  { "id": "brazos-3", "nombre": "Curl martillo", "categoria": "brazos" },
+  { "id": "piernas-1", "nombre": "Sentadilla", "categoria": "piernas" },
+  { "id": "piernas-2", "nombre": "Peso muerto rumano", "categoria": "piernas" },
+  { "id": "piernas-3", "nombre": "Prensa", "categoria": "piernas" }
+]
