@@ -42,11 +42,28 @@ create table if not exists rutina_dias (
   dia_semana int not null check (dia_semana between 0 and 6)
 );
 
+-- Historial de peso levantado por ejercicio, para trackear progreso.
+-- Se ancla al ejercicio (ejercicio_id/nombre), no a la fila de rutina_ejercicios,
+-- para que el progreso sobreviva si el ejercicio se quita de una rutina.
+create table if not exists registros_ejercicio (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references profiles(id) on delete cascade,
+  ejercicio_id text not null,
+  ejercicio_nombre text not null,
+  peso_kg numeric not null,
+  reps int,
+  created_at timestamptz default now()
+);
+
+create index if not exists registros_ejercicio_user_ejercicio_idx
+  on registros_ejercicio (user_id, ejercicio_id, created_at desc);
+
 alter table profiles enable row level security;
 alter table rutinas enable row level security;
 alter table ejercicios_custom enable row level security;
 alter table rutina_ejercicios enable row level security;
 alter table rutina_dias enable row level security;
+alter table registros_ejercicio enable row level security;
 
 create policy "profiles_select_own" on profiles for select using (auth.uid() = id);
 create policy "profiles_update_own" on profiles for update using (auth.uid() = id);
@@ -63,6 +80,9 @@ create policy "rutina_ejercicios_all_own" on rutina_ejercicios for all
   with check (exists (select 1 from rutinas r where r.id = rutina_ejercicios.rutina_id and r.user_id = auth.uid()));
 
 create policy "rutina_dias_all_own" on rutina_dias for all
+  using (auth.uid() = user_id) with check (auth.uid() = user_id);
+
+create policy "registros_ejercicio_all_own" on registros_ejercicio for all
   using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
 -- Populate profiles automatically on signup, from auth.signUp options.data.
