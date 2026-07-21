@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Weight, Trash, Check, ChevronDown } from "reicon-react";
 import { registrarPeso } from "@/app/actions/registros";
+import ProgresoChart from "@/components/ProgresoChart";
 
 export type Registro = {
   id: string;
@@ -117,6 +118,7 @@ export default function EjercicioRow({
                 <Weight size={13} />
                 Historial
               </span>
+              <ProgresoChart historial={historial} />
               <ul className="flex flex-col gap-1">
                 {historial.slice(0, 5).map((r) => (
                   <li key={r.id} className="flex items-center justify-between text-xs text-muted">
