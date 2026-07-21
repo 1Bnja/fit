@@ -1,9 +1,8 @@
-Colocar aquí los íconos SVG de cada categoría muscular. Nombres esperados:
+Colocar aquí los íconos PNG (silueta negra sobre fondo transparente) de cada categoría muscular. Nombres esperados:
 
-- pecho.svg
-- espalda.svg
-- hombros.svg
-- brazos.svg
-- piernas.svg
+- pecho.png
+- espalda.png
+- brazos.png
+- piernas.png
 
-Mientras un archivo no exista, la UI muestra un círculo con la inicial de la categoría como placeholder.
+Se muestran invertidos (blanco) vía CSS para que se vean sobre el fondo oscuro. Mientras un archivo no exista, la UI muestra un ícono genérico como placeholder.
