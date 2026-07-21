@@ -1,6 +1,8 @@
 "use client";
 
 import { useActionState } from "react";
+import { Dumbbell } from "reicon-react";
+import Field from "@/components/Field";
 import { crearRutina, type FormState } from "@/app/actions/rutinas";
 
 const initialState: FormState = {};
@@ -12,19 +14,16 @@ export default function NuevaRutinaPage() {
     <form action={formAction} className="flex max-w-sm flex-col gap-4">
       <h1 className="text-xl font-medium">Nueva rutina</h1>
 
-      <div className="flex flex-col gap-1">
-        <label htmlFor="nombre" className="text-sm text-muted">
-          Nombre
-        </label>
-        <input id="nombre" name="nombre" type="text" required autoFocus />
-      </div>
+      <Field label="Nombre" icon={<Dumbbell size={16} />}>
+        <input id="nombre" name="nombre" type="text" placeholder="Ej. Empuje" required autoFocus />
+      </Field>
 
       {state.error && <p className="text-sm text-danger">{state.error}</p>}
 
       <button
         type="submit"
         disabled={pending}
-        className="rounded-md bg-accent px-4 py-2 text-sm font-medium text-accent-foreground disabled:opacity-50"
+        className="rounded-xl bg-accent px-4 py-2.5 text-sm font-medium text-accent-foreground hover:opacity-90 disabled:opacity-50"
       >
         {pending ? "Creando..." : "Crear"}
       </button>

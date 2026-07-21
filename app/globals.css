@@ -2,12 +2,12 @@
 
 :root {
   --background: #0a0a0a;
-  --surface: #111111;
-  --surface-2: #17171a;
-  --border: #262626;
-  --foreground: #ededed;
-  --muted: #8a8a8a;
-  --accent: #3b82f6;
+  --surface: #111113;
+  --surface-2: #1a1a1d;
+  --border: #262629;
+  --foreground: #f2f2f3;
+  --muted: #8a8a90;
+  --accent: #6c5ce7;
   --accent-foreground: #ffffff;
   --danger: #ef4444;
 }
@@ -26,27 +26,40 @@
   --font-mono: var(--font-geist-mono);
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  font-weight: 400;
-}
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
 
-input,
-select,
-textarea {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  color: var(--foreground);
-  padding: 0.5rem 0.75rem;
-  font-size: 0.875rem;
-}
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-weight: 400;
+  }
 
-input:focus,
-select:focus,
-textarea:focus {
-  outline: none;
-  border-color: var(--accent);
+  input,
+  select,
+  textarea {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--foreground);
+    padding: 0.625rem 0.75rem;
+    font-size: 0.875rem;
+    width: 100%;
+    transition: border-color 0.15s ease;
+  }
+
+  input:focus,
+  select:focus,
+  textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--muted);
+  }
 }

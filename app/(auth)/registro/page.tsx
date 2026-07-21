@@ -2,6 +2,8 @@
 
 import { useActionState } from "react";
 import Link from "next/link";
+import { User, Envelope, Lock } from "reicon-react";
+import Field from "@/components/Field";
 import { registro, type AuthState } from "@/app/actions/auth";
 
 const initialState: AuthState = {};
@@ -14,40 +16,25 @@ export default function RegistroPage() {
       <h1 className="text-lg font-medium">Crear cuenta</h1>
 
       <div className="grid grid-cols-2 gap-3">
-        <div className="flex flex-col gap-1">
-          <label htmlFor="nombre" className="text-sm text-muted">
-            Nombre
-          </label>
+        <Field label="Nombre" icon={<User size={16} />}>
           <input id="nombre" name="nombre" type="text" required />
-        </div>
-        <div className="flex flex-col gap-1">
-          <label htmlFor="apellido" className="text-sm text-muted">
-            Apellido
-          </label>
+        </Field>
+        <Field label="Apellido" icon={<User size={16} />}>
           <input id="apellido" name="apellido" type="text" required />
-        </div>
+        </Field>
       </div>
 
-      <div className="flex flex-col gap-1">
-        <label htmlFor="username" className="text-sm text-muted">
-          Nombre de usuario
-        </label>
+      <Field label="Nombre de usuario" icon={<User size={16} />}>
         <input id="username" name="username" type="text" required />
-      </div>
+      </Field>
 
-      <div className="flex flex-col gap-1">
-        <label htmlFor="email" className="text-sm text-muted">
-          Correo
-        </label>
-        <input id="email" name="email" type="email" required />
-      </div>
+      <Field label="Correo" icon={<Envelope size={16} />}>
+        <input id="email" name="email" type="email" placeholder="tu@correo.com" required />
+      </Field>
 
-      <div className="flex flex-col gap-1">
-        <label htmlFor="password" className="text-sm text-muted">
-          Contraseña
-        </label>
-        <input id="password" name="password" type="password" required minLength={6} />
-      </div>
+      <Field label="Contraseña" icon={<Lock size={16} />}>
+        <input id="password" name="password" type="password" placeholder="••••••••" required minLength={6} />
+      </Field>
 
       {state.error && <p className="text-sm text-danger">{state.error}</p>}
       {state.info && <p className="text-sm text-accent">{state.info}</p>}
@@ -55,12 +42,12 @@ export default function RegistroPage() {
       <button
         type="submit"
         disabled={pending}
-        className="mt-2 rounded-md bg-accent px-4 py-2 text-sm font-medium text-accent-foreground disabled:opacity-50"
+        className="mt-2 rounded-xl bg-accent px-4 py-2.5 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
       >
         {pending ? "Creando cuenta..." : "Crear cuenta"}
       </button>
 
-      <p className="text-sm text-muted">
+      <p className="text-center text-sm text-muted">
         ¿Ya tienes cuenta?{" "}
         <Link href="/login" className="text-accent">
           Inicia sesión
