@@ -38,7 +38,7 @@
     font-weight: 400;
   }
 
-  input,
+  input:not([type="checkbox"]):not([type="radio"]),
   select,
   textarea {
     background: var(--surface);
@@ -51,7 +51,7 @@
     transition: border-color 0.15s ease;
   }
 
-  input:focus,
+  input:not([type="checkbox"]):not([type="radio"]):focus,
   select:focus,
   textarea:focus {
     outline: none;
@@ -61,5 +61,13 @@
   input::placeholder,
   textarea::placeholder {
     color: var(--muted);
+  }
+
+  input[type="checkbox"],
+  input[type="radio"] {
+    accent-color: var(--accent);
+    height: 1rem;
+    width: 1rem;
+    flex-shrink: 0;
   }
 }
