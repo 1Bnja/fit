@@ -27,5 +27,9 @@ export async function completarOnboarding(
 
   if (error) return { error: "No se pudo guardar. Intenta de nuevo." };
 
+  // Mirrors profiles.onboarding_completo onto the JWT so the middleware can
+  // gate routes without an extra DB round trip on every navigation.
+  await supabase.auth.updateUser({ data: { onboarding_completo: true } });
+
   redirect("/home");
 }

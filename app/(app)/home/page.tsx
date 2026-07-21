@@ -8,19 +8,16 @@ export default async function HomePage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("nombre, peso_kg, estatura_cm")
-    .eq("id", user!.id)
-    .single();
-
   const hoy = new Date().getDay();
 
-  const { data: rutinasHoy } = await supabase
-    .from("rutina_dias")
-    .select("rutinas(id, nombre)")
-    .eq("user_id", user!.id)
-    .eq("dia_semana", hoy);
+  const [{ data: profile }, { data: rutinasHoy }] = await Promise.all([
+    supabase.from("profiles").select("nombre, peso_kg, estatura_cm").eq("id", user!.id).single(),
+    supabase
+      .from("rutina_dias")
+      .select("rutinas(id, nombre)")
+      .eq("user_id", user!.id)
+      .eq("dia_semana", hoy),
+  ]);
 
   return (
     <div className="flex flex-col gap-6">

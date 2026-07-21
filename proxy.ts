@@ -41,13 +41,7 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL("/home", request.url));
   }
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("onboarding_completo")
-    .eq("id", user.id)
-    .single();
-
-  const onboardingCompleto = profile?.onboarding_completo ?? false;
+  const onboardingCompleto = user.user_metadata?.onboarding_completo ?? false;
 
   if (!onboardingCompleto && path !== "/onboarding") {
     return NextResponse.redirect(new URL("/onboarding", request.url));
