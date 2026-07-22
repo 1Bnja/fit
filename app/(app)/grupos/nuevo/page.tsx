@@ -11,7 +11,7 @@ export default function NuevoGrupoPage() {
   const [state, formAction, pending] = useActionState(crearGrupo, initialState);
 
   return (
-    <form action={formAction} className="flex max-w-sm flex-col gap-4">
+    <form action={formAction} className="mx-auto flex w-full max-w-sm flex-col gap-4">
       <h1 className="text-xl font-medium">Nuevo grupo</h1>
 
       <Field label="Nombre" icon={<Users size={16} />}>
