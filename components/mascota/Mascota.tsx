@@ -1,4 +1,5 @@
 import Image from "next/image";
+import styles from "./Mascota.module.css";
 
 const STAT_LABELS = {
   piernas: "Piernas",
@@ -57,7 +58,7 @@ export default function Mascota({
               alt={`${nombre}, tu mascota virtual`}
               width={128}
               height={128}
-              className="ovejita-wiggle h-28 w-28 shrink-0 object-contain"
+              className={`${styles.wiggle} h-28 w-28 shrink-0 object-contain`}
             />
           ) : (
             <span className="flex h-28 w-28 items-center justify-center text-sm text-muted">
@@ -108,7 +109,7 @@ export default function Mascota({
             alt={nombre}
             width={128}
             height={128}
-            className="ovejita-wiggle-continuo mx-auto mt-4 h-28 w-28 object-contain"
+            className={`${styles.wiggleContinuo} mx-auto mt-4 h-28 w-28 object-contain`}
           />
         ) : (
           <p className="mt-4 text-center text-sm text-muted">Imagen no disponible</p>

@@ -86,31 +86,3 @@
     cursor: pointer;
   }
 }
-
-@keyframes ovejita-wiggle {
-  0%,
-  100% {
-    transform: rotate(0deg) translateY(0);
-  }
-  25% {
-    transform: rotate(-6deg) translateY(-2px);
-  }
-  50% {
-    transform: rotate(6deg) translateY(0);
-  }
-  75% {
-    transform: rotate(-3deg) translateY(-1px);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .ovejita-wiggle {
-    animation: ovejita-wiggle 650ms ease-in-out both;
-    transform-origin: center bottom;
-  }
-
-  .ovejita-wiggle-continuo {
-    animation: ovejita-wiggle 1800ms ease-in-out infinite;
-    transform-origin: center bottom;
-  }
-}
