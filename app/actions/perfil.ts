@@ -35,7 +35,7 @@ export async function actualizarPerfil(
       .from("avatars")
       .upload(path, foto, { upsert: true, contentType: foto.type });
 
-    if (uploadError) return { error: "No se pudo subir la foto." };
+    if (uploadError) return { error: `No se pudo subir la foto: ${uploadError.message}` };
 
     const {
       data: { publicUrl },

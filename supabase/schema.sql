@@ -196,7 +196,7 @@ create trigger on_auth_user_created
 -- since a public SELECT policy on storage.objects also allows *listing* the
 -- bucket's contents, not just reading known paths.
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
-values ('avatars', 'avatars', true, 2097152, array['image/png','image/jpeg','image/webp'])
+values ('avatars', 'avatars', true, 10485760, array['image/png','image/jpeg','image/webp'])
 on conflict (id) do nothing;
 
 create policy "avatar_owner_insert" on storage.objects for insert to authenticated

@@ -16,10 +16,12 @@ type Perfil = {
 } | null;
 
 const initialState: PerfilState = {};
+const MAX_FOTO_BYTES = 10 * 1024 * 1024;
 
 export default function PerfilForm({ perfil, email }: { perfil: Perfil; email: string }) {
   const [state, formAction, pending] = useActionState(actualizarPerfil, initialState);
   const [preview, setPreview] = useState<string | null>(null);
+  const [fotoError, setFotoError] = useState<string | null>(null);
 
   return (
     <form action={formAction} className="flex max-w-sm flex-col gap-4">
@@ -42,11 +44,19 @@ export default function PerfilForm({ perfil, email }: { perfil: Perfil; email: s
           className="hidden"
           onChange={(ev) => {
             const file = ev.target.files?.[0];
-            if (file) setPreview(URL.createObjectURL(file));
+            if (!file) return;
+            if (file.size > MAX_FOTO_BYTES) {
+              setFotoError("La foto no puede pesar más de 10 MB.");
+              ev.target.value = "";
+              return;
+            }
+            setFotoError(null);
+            setPreview(URL.createObjectURL(file));
           }}
         />
       </label>
 
+      {fotoError && <p className="text-center text-sm text-danger">{fotoError}</p>}
       <p className="text-center text-sm text-muted">{email}</p>
 
       <div className="grid grid-cols-2 gap-3">
