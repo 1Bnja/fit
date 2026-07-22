@@ -31,7 +31,12 @@ export async function registro(_prev: AuthState, formData: FormData): Promise<Au
     options: { data: { nombre, apellido, username } },
   });
 
-  if (error) return { error: "No se pudo crear la cuenta. Verifica los datos." };
+  if (error) {
+    if (error.code === "over_email_send_rate_limit" || error.status === 429) {
+      return { error: "Demasiados registros en poco tiempo. Intenta de nuevo en unos minutos." };
+    }
+    return { error: "No se pudo crear la cuenta. Verifica los datos." };
+  }
   if (!data.user) return { error: "No se pudo crear la cuenta." };
 
   if (!data.session) {
