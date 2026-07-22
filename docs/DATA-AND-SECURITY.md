@@ -135,4 +135,4 @@ El bucket publico `avatars` admite PNG, JPEG y WebP hasta 10 MB. El nombre esper
 - El esquema es un archivo de bootstrap idempotente parcial, no una secuencia versionada de migraciones.
 - No hay tipos TypeScript generados desde Supabase; cambios de columnas pueden fallar solo en ejecucion.
 - El codigo de grupo usa `Math.random()` y seis caracteres. Es una invitacion practica, no un secreto criptografico.
-- El service worker almacena respuestas `GET` autenticadas en el cache local del navegador.
+- El service worker almacena respuestas `GET` atenticados en el cache local del navegador.
