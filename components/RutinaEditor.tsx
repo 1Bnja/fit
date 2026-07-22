@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, Calendar, List, X } from "reicon-react";
+import { Plus, Calendar, List, X, Trash } from "reicon-react";
 import CategoriaGrid from "@/components/CategoriaGrid";
 import EjercicioRow, { type Registro } from "@/components/EjercicioRow";
 import { exercisesByCategoria } from "@/lib/exercises";
@@ -12,6 +12,7 @@ import {
   agregarEjercicios,
   quitarEjercicio,
   crearEjercicioCustom,
+  eliminarRutina,
 } from "@/app/actions/rutinas";
 
 const DIAS = [
@@ -95,9 +96,26 @@ export default function RutinaEditor({
     setVista("lista");
   }
 
+  function eliminar() {
+    if (!confirm(`¿Eliminar "${nombre}"? Esta acción no se puede deshacer.`)) return;
+    startTransition(async () => {
+      await eliminarRutina(rutinaId);
+    });
+  }
+
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-xl font-medium">{nombre}</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-xl font-medium">{nombre}</h1>
+        <button
+          type="button"
+          onClick={eliminar}
+          aria-label="Eliminar rutina"
+          className="flex h-9 w-9 items-center justify-center rounded-lg text-muted hover:bg-surface-2 hover:text-danger"
+        >
+          <Trash size={16} />
+        </button>
+      </div>
 
       <div>
         <h2 className="mb-2 flex items-center gap-1.5 text-sm font-medium text-muted">

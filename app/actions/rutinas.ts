@@ -28,6 +28,17 @@ export async function crearRutina(_prev: FormState, formData: FormData): Promise
   redirect(`/rutinas/${data.id}`);
 }
 
+export async function eliminarRutina(rutinaId: string) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  await supabase.from("rutinas").delete().eq("id", rutinaId).eq("user_id", user!.id);
+  redirect("/rutinas");
+}
+
 export async function asignarDias(rutinaId: string, dias: number[]) {
   const supabase = await createClient();
   const {
