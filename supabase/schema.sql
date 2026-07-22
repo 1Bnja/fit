@@ -134,8 +134,13 @@ as $$
   );
 $$;
 
+-- creado_por = auth.uid() is included (not just is_grupo_member) because
+-- Postgres requires INSERT ... RETURNING rows to already pass the SELECT
+-- policy — the on_grupo_created trigger's membership insert doesn't count
+-- in time for that check, so without this the creator's own insert+select
+-- (crearGrupo) fails with "new row violates row-level security policy".
 create policy "grupos_select_member" on grupos for select
-  using (is_grupo_member(id));
+  using (is_grupo_member(id) or creado_por = auth.uid());
 
 create policy "grupos_insert_own" on grupos for insert
   with check (creado_por = auth.uid());
