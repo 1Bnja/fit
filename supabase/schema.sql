@@ -58,12 +58,32 @@ create table if not exists registros_ejercicio (
 create index if not exists registros_ejercicio_user_ejercicio_idx
   on registros_ejercicio (user_id, ejercicio_id, created_at desc);
 
+-- Grupos de entrenamiento: unirse por código de invitación, ver actividad,
+-- progreso y rutinas de los demás miembros.
+create table if not exists grupos (
+  id uuid primary key default gen_random_uuid(),
+  nombre text not null,
+  codigo text not null unique,
+  creado_por uuid references profiles(id) on delete cascade,
+  created_at timestamptz default now()
+);
+
+create table if not exists grupo_miembros (
+  id uuid primary key default gen_random_uuid(),
+  grupo_id uuid references grupos(id) on delete cascade,
+  user_id uuid references profiles(id) on delete cascade,
+  joined_at timestamptz default now(),
+  unique (grupo_id, user_id)
+);
+
 alter table profiles enable row level security;
 alter table rutinas enable row level security;
 alter table ejercicios_custom enable row level security;
 alter table rutina_ejercicios enable row level security;
 alter table rutina_dias enable row level security;
 alter table registros_ejercicio enable row level security;
+alter table grupos enable row level security;
+alter table grupo_miembros enable row level security;
 
 create policy "profiles_select_own" on profiles for select using (auth.uid() = id);
 create policy "profiles_update_own" on profiles for update using (auth.uid() = id);
@@ -85,6 +105,66 @@ create policy "rutina_dias_all_own" on rutina_dias for all
 create policy "registros_ejercicio_all_own" on registros_ejercicio for all
   using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
+-- Bypasses RLS on purpose: lets a policy check membership/shared-group
+-- without the self-referencing recursion a plain RLS subquery would hit.
+create or replace function public.is_grupo_member(p_grupo_id uuid)
+returns boolean
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select exists (
+    select 1 from grupo_miembros
+    where grupo_id = p_grupo_id and user_id = auth.uid()
+  );
+$$;
+
+create or replace function public.comparte_grupo_con(p_user_id uuid)
+returns boolean
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select exists (
+    select 1 from grupo_miembros gm1
+    join grupo_miembros gm2 on gm1.grupo_id = gm2.grupo_id
+    where gm1.user_id = auth.uid() and gm2.user_id = p_user_id
+  );
+$$;
+
+create policy "grupos_select_member" on grupos for select
+  using (is_grupo_member(id));
+
+create policy "grupos_insert_own" on grupos for insert
+  with check (creado_por = auth.uid());
+
+create policy "grupo_miembros_select_member" on grupo_miembros for select
+  using (is_grupo_member(grupo_id));
+
+create policy "grupo_miembros_delete_own" on grupo_miembros for delete
+  using (user_id = auth.uid());
+
+-- Extend existing tables with group-visibility, alongside (not replacing)
+-- the existing "own data only" policies.
+create policy "profiles_select_grupo" on profiles for select
+  using (comparte_grupo_con(id));
+
+create policy "rutinas_select_grupo" on rutinas for select
+  using (comparte_grupo_con(user_id));
+
+create policy "rutina_ejercicios_select_grupo" on rutina_ejercicios for select
+  using (exists (
+    select 1 from rutinas r where r.id = rutina_ejercicios.rutina_id and comparte_grupo_con(r.user_id)
+  ));
+
+create policy "rutina_dias_select_grupo" on rutina_dias for select
+  using (comparte_grupo_con(user_id));
+
+create policy "registros_ejercicio_select_grupo" on registros_ejercicio for select
+  using (comparte_grupo_con(user_id));
+
 -- Populate profiles automatically on signup, from auth.signUp options.data.
 create or replace function public.handle_new_user()
 returns trigger as $$
@@ -104,3 +184,47 @@ drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function public.handle_new_user();
+
+-- Auto-join the creator as the first member (mirrors handle_new_user's pattern).
+create or replace function public.handle_new_grupo()
+returns trigger as $$
+begin
+  insert into public.grupo_miembros (grupo_id, user_id)
+  values (new.id, new.creado_por);
+  return new;
+end;
+$$ language plpgsql security definer set search_path = public;
+
+drop trigger if exists on_grupo_created on grupos;
+create trigger on_grupo_created
+  after insert on grupos
+  for each row execute function public.handle_new_grupo();
+
+-- Joining by code always goes through here (grupo_miembros has no direct
+-- insert policy), so membership can never be granted by guessing a group's
+-- uuid — you need the invite code.
+create or replace function public.unirse_a_grupo(p_codigo text)
+returns table (id uuid, nombre text)
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_grupo_id uuid;
+begin
+  if auth.uid() is null then
+    raise exception 'no_autenticado';
+  end if;
+
+  select g.id into v_grupo_id from grupos g where g.codigo = upper(p_codigo);
+  if v_grupo_id is null then
+    raise exception 'codigo_invalido';
+  end if;
+
+  insert into grupo_miembros (grupo_id, user_id)
+  values (v_grupo_id, auth.uid())
+  on conflict (grupo_id, user_id) do nothing;
+
+  return query select g.id, g.nombre from grupos g where g.id = v_grupo_id;
+end;
+$$;

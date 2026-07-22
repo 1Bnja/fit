@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, List } from "reicon-react";
+import { Home, List, Users } from "reicon-react";
 
 const TABS = [
   { href: "/home", label: "Home", icon: Home },
   { href: "/rutinas", label: "Rutinas", icon: List },
+  { href: "/grupos", label: "Grupos", icon: Users },
 ];
 
 export default function NavTabs() {
