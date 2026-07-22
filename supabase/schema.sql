@@ -7,6 +7,7 @@ create table if not exists profiles (
   username text unique,
   peso_kg numeric,
   estatura_cm numeric,
+  avatar_url text,
   onboarding_completo boolean default false,
   created_at timestamptz default now()
 );
@@ -189,6 +190,23 @@ drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function public.handle_new_user();
+
+-- Avatar uploads: one file per user at "${user.id}/...". Public bucket, so
+-- getPublicUrl() works without a SELECT policy — deliberately not adding one,
+-- since a public SELECT policy on storage.objects also allows *listing* the
+-- bucket's contents, not just reading known paths.
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values ('avatars', 'avatars', true, 2097152, array['image/png','image/jpeg','image/webp'])
+on conflict (id) do nothing;
+
+create policy "avatar_owner_insert" on storage.objects for insert to authenticated
+  with check (bucket_id = 'avatars' and (storage.foldername(name))[1] = auth.uid()::text);
+
+create policy "avatar_owner_update" on storage.objects for update to authenticated
+  using (bucket_id = 'avatars' and (storage.foldername(name))[1] = auth.uid()::text);
+
+create policy "avatar_owner_delete" on storage.objects for delete to authenticated
+  using (bucket_id = 'avatars' and (storage.foldername(name))[1] = auth.uid()::text);
 
 -- Auto-join the creator as the first member (mirrors handle_new_user's pattern).
 create or replace function public.handle_new_grupo()
