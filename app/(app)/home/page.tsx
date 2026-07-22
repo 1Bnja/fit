@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { mascotaEstaInactiva } from "@/lib/mascota.mjs";
+import { mascotaEstaInactiva, obtenerEvolucionMascota } from "@/lib/mascota.mjs";
 import Mascota from "@/components/mascota/Mascota";
 import { Scale, Ruler, Flame, ChevronRight, Dumbbell } from "reicon-react";
 import Link from "next/link";
@@ -12,10 +12,10 @@ export default async function HomePage() {
 
   const hoy = new Date().getDay();
 
-  const [{ data: profile }, { data: rutinasHoy }, { data: ultimoRegistro }] = await Promise.all([
+  const [{ data: profile }, { data: rutinasHoy }, { data: mascotaUsuario }] = await Promise.all([
     supabase
       .from("profiles")
-      .select("nombre, peso_kg, estatura_cm, created_at")
+      .select("nombre, peso_kg, estatura_cm, created_at, last_active_at")
       .eq("id", user!.id)
       .single(),
     supabase
@@ -24,17 +24,42 @@ export default async function HomePage() {
       .eq("user_id", user!.id)
       .eq("dia_semana", hoy),
     supabase
-      .from("registros_ejercicio")
-      .select("created_at")
+      .from("usuario_mascotas")
+      .select(`
+        xp,
+        estado,
+        piernas,
+        brazos,
+        pecho,
+        abdomen,
+        espalda,
+        mascotas (
+          clave,
+          nombre,
+          mascota_fases (
+            numero,
+            nombre,
+            xp_requerida,
+            imagen_url
+          )
+        )
+      `)
       .eq("user_id", user!.id)
-      .order("created_at", { ascending: false })
-      .limit(1)
+      .eq("seleccionada", true)
       .maybeSingle(),
   ]);
 
-  const mostrarTumba = mascotaEstaInactiva(
-    ultimoRegistro?.created_at ?? profile?.created_at
+  const mascota = Array.isArray(mascotaUsuario?.mascotas)
+    ? mascotaUsuario.mascotas[0]
+    : mascotaUsuario?.mascotas;
+  const xp = mascotaUsuario?.xp ?? 0;
+  const { faseActual, progreso } = obtenerEvolucionMascota(
+    mascota?.mascota_fases ?? [],
+    xp
   );
+  const mostrarTumba =
+    mascotaUsuario?.estado === "tumba" ||
+    mascotaEstaInactiva(profile?.last_active_at ?? profile?.created_at);
 
   return (
     <div className="flex flex-col gap-6">
@@ -52,7 +77,21 @@ export default async function HomePage() {
         </div>
       </div>
 
-      <Mascota inactiva={mostrarTumba} />
+      <Mascota
+        clave={mascota?.clave ?? "ovejita"}
+        nombre={mascota?.nombre ?? "Ovejita"}
+        fase={faseActual?.nombre ?? "Fase inicial"}
+        imagenUrl={faseActual?.imagen_url ?? null}
+        inactiva={mostrarTumba}
+        progreso={progreso}
+        stats={{
+          piernas: mascotaUsuario?.piernas ?? 0,
+          brazos: mascotaUsuario?.brazos ?? 0,
+          pecho: mascotaUsuario?.pecho ?? 0,
+          abdomen: mascotaUsuario?.abdomen ?? 0,
+          espalda: mascotaUsuario?.espalda ?? 0,
+        }}
+      />
 
       <div>
         <h2 className="mb-2 flex items-center gap-1.5 text-sm font-medium text-muted">

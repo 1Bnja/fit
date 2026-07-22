@@ -1,44 +1,73 @@
-import { MASCOTA_CLAVE } from "@/lib/mascota.mjs";
 import Image from "next/image";
 
-const STATS = ["Piernas", "Brazos", "Pecho", "Abdomen", "Espalda"];
+const STAT_LABELS = {
+  piernas: "Piernas",
+  brazos: "Brazos",
+  pecho: "Pecho",
+  abdomen: "Abdomen",
+  espalda: "Espalda",
+} as const;
 
-export default function Mascota({ inactiva }: { inactiva: boolean }) {
+type Stat = keyof typeof STAT_LABELS;
+
+type MascotaProps = {
+  clave: string;
+  nombre: string;
+  fase: string;
+  imagenUrl: string | null;
+  inactiva: boolean;
+  progreso: number;
+  stats: Record<Stat, number>;
+};
+
+export default function Mascota({
+  clave,
+  nombre,
+  fase,
+  imagenUrl,
+  inactiva,
+  progreso,
+  stats,
+}: MascotaProps) {
   return (
     <>
       <section
-        data-mascota={MASCOTA_CLAVE}
+        data-mascota={clave}
         className="flex min-h-40 flex-col items-center gap-2 overflow-hidden rounded-2xl border border-border bg-surface p-5 text-center"
       >
-        <h2 className="text-lg font-medium">Ovejita</h2>
+        <h2 className="text-lg font-medium">{nombre}</h2>
 
         <button
           type="button"
           popoverTarget="mascota-stats"
-          aria-label="Ver estadísticas de Ovejita"
+          aria-label={`Ver estadísticas de ${nombre}`}
           className="rounded-2xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
         >
           {inactiva ? (
             <span
               role="img"
-              aria-label="Tumba de Ovejita"
+              aria-label={`Tumba de ${nombre}`}
               className="flex h-28 w-28 shrink-0 items-center justify-center rounded-2xl border border-border bg-surface-2 text-sm font-medium text-muted"
             >
               Tumba
             </span>
-          ) : (
+          ) : imagenUrl ? (
             <Image
-              src="/mascotas/oveja.png"
-              alt="Ovejita, tu mascota virtual"
+              src={imagenUrl}
+              alt={`${nombre}, tu mascota virtual`}
               width={128}
               height={128}
               className="ovejita-wiggle h-28 w-28 shrink-0 object-contain"
             />
+          ) : (
+            <span className="flex h-28 w-28 items-center justify-center text-sm text-muted">
+              Imagen no disponible
+            </span>
           )}
         </button>
 
         <p className="text-sm text-muted">
-          {inactiva ? "Más de una semana sin actividad." : "Fase inicial"}
+          {inactiva ? "Más de una semana sin actividad." : fase}
         </p>
       </section>
 
@@ -52,7 +81,7 @@ export default function Mascota({ inactiva }: { inactiva: boolean }) {
         <div className="flex items-start justify-between gap-4">
           <div>
             <h2 id="mascota-stats-title" className="text-lg font-medium">
-              Estadísticas de Ovejita
+              Estadísticas de {nombre}
             </h2>
             <p className="mt-1 text-sm text-muted">
               Realizar misiones sumará puntos a estos atributos.
@@ -73,24 +102,26 @@ export default function Mascota({ inactiva }: { inactiva: boolean }) {
           <div className="mx-auto mt-4 flex h-28 w-28 items-center justify-center rounded-2xl border border-border bg-surface-2 text-sm font-medium text-muted">
             Tumba
           </div>
-        ) : (
+        ) : imagenUrl ? (
           <Image
-            src="/mascotas/oveja.png"
-            alt="Ovejita"
+            src={imagenUrl}
+            alt={nombre}
             width={128}
             height={128}
             className="ovejita-wiggle-continuo mx-auto mt-4 h-28 w-28 object-contain"
           />
+        ) : (
+          <p className="mt-4 text-center text-sm text-muted">Imagen no disponible</p>
         )}
 
         <dl className="mt-4 flex flex-col gap-2">
-          {STATS.map((stat) => (
+          {(Object.entries(STAT_LABELS) as [Stat, string][]).map(([stat, label]) => (
             <div
               key={stat}
               className="flex items-center justify-between rounded-xl bg-surface-2 px-4 py-3 text-sm"
             >
-              <dt>{stat}</dt>
-              <dd className="font-medium text-accent">0</dd>
+              <dt>{label}</dt>
+              <dd className="font-medium text-accent">{stats[stat]}</dd>
             </div>
           ))}
         </dl>
@@ -106,19 +137,19 @@ export default function Mascota({ inactiva }: { inactiva: boolean }) {
               Tareas y metas
             </h2>
             <p className="mt-1 text-sm text-muted">
-              Completa metas para hacer evolucionar a Ovejita.
+              Completa metas para hacer evolucionar a {nombre}.
             </p>
           </div>
-          <span className="text-sm font-medium text-accent">0%</span>
+          <span className="text-sm font-medium text-accent">{progreso}%</span>
         </div>
 
         <progress
           aria-label="Progreso para la siguiente evolución"
-          value={0}
+          value={progreso}
           max={100}
           className="h-2 w-full accent-accent"
         >
-          0%
+          {progreso}%
         </progress>
 
         <div className="grid gap-3 sm:grid-cols-2">

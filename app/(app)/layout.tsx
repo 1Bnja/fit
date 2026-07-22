@@ -1,9 +1,31 @@
 import Link from "next/link";
 import { logout } from "@/app/actions/auth";
 import NavTabs from "@/components/NavTabs";
+import { mascotaEstaInactiva } from "@/lib/mascota.mjs";
+import { createClient } from "@/lib/supabase/server";
 import { Logout, User } from "reicon-react";
 
-export default function AppLayout({ children }: { children: React.ReactNode }) {
+export default async function AppLayout({ children }: { children: React.ReactNode }) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (user) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("last_active_at, created_at")
+      .eq("id", user.id)
+      .single();
+
+    if (!mascotaEstaInactiva(profile?.last_active_at ?? profile?.created_at)) {
+      await supabase
+        .from("profiles")
+        .update({ last_active_at: new Date().toISOString() })
+        .eq("id", user.id);
+    }
+  }
+
   return (
     <div className="flex flex-1 flex-col pb-16">
       <header className="border-b border-border">
