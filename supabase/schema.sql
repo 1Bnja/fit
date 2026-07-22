@@ -192,9 +192,9 @@ create trigger on_auth_user_created
   for each row execute function public.handle_new_user();
 
 -- Avatar uploads: one file per user at "${user.id}/...". Public bucket, so
--- getPublicUrl() works without a SELECT policy — deliberately not adding one,
--- since a public SELECT policy on storage.objects also allows *listing* the
--- bucket's contents, not just reading known paths.
+-- getPublicUrl() works without a public SELECT policy — deliberately not
+-- adding one, since a public SELECT policy on storage.objects also allows
+-- *listing* the bucket's contents, not just reading known paths.
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 values ('avatars', 'avatars', true, 10485760, array['image/png','image/jpeg','image/webp'])
 on conflict (id) do nothing;
@@ -206,6 +206,14 @@ create policy "avatar_owner_update" on storage.objects for update to authenticat
   using (bucket_id = 'avatars' and (storage.foldername(name))[1] = auth.uid()::text);
 
 create policy "avatar_owner_delete" on storage.objects for delete to authenticated
+  using (bucket_id = 'avatars' and (storage.foldername(name))[1] = auth.uid()::text);
+
+-- Not public — scoped to the owner. Storage's upload(upsert: true) does an
+-- INSERT/UPDATE ... RETURNING internally, and (same as the grupos insert
+-- earlier) Postgres requires the row to already pass a SELECT policy for
+-- RETURNING to succeed. Without this, every upload failed with "new row
+-- violates row-level security policy" even though insert/update both passed.
+create policy "avatar_owner_select" on storage.objects for select to authenticated
   using (bucket_id = 'avatars' and (storage.foldername(name))[1] = auth.uid()::text);
 
 -- Auto-join the creator as the first member (mirrors handle_new_user's pattern).
