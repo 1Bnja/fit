@@ -13,6 +13,33 @@ export type Registro = {
   created_at: string;
 };
 
+function agruparPorDia(historial: Registro[]) {
+  const grupos: { key: string; fecha: Date; entradas: Registro[] }[] = [];
+  for (const r of historial) {
+    const fecha = new Date(r.created_at);
+    const key = fecha.toDateString();
+    const ultimo = grupos[grupos.length - 1];
+    if (ultimo && ultimo.key === key) {
+      ultimo.entradas.push(r);
+    } else {
+      grupos.push({ key, fecha, entradas: [r] });
+    }
+  }
+  return grupos;
+}
+
+function etiquetaFecha(fecha: Date) {
+  const hoy = new Date();
+  const ayer = new Date(hoy);
+  ayer.setDate(hoy.getDate() - 1);
+  const mismoDia = (a: Date, b: Date) =>
+    a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+
+  if (mismoDia(fecha, hoy)) return "Hoy";
+  if (mismoDia(fecha, ayer)) return "Ayer";
+  return fecha.toLocaleDateString("es-CL", { day: "2-digit", month: "2-digit" });
+}
+
 export default function EjercicioRow({
   rutinaId,
   ejercicioId,
@@ -120,19 +147,23 @@ export default function EjercicioRow({
               </span>
               <ProgresoChart historial={historial} />
               <ul className="flex flex-col gap-1">
-                {historial.slice(0, 5).map((r) => (
-                  <li key={r.id} className="flex items-center justify-between text-xs text-muted">
-                    <span>
-                      {new Date(r.created_at).toLocaleDateString("es-CL", {
-                        day: "2-digit",
-                        month: "2-digit",
-                      })}
-                    </span>
-                    <span className="text-foreground">
-                      {r.peso_kg} kg{r.reps ? ` × ${r.reps}` : ""}
-                    </span>
-                  </li>
-                ))}
+                {agruparPorDia(historial)
+                  .slice(0, 5)
+                  .map((grupo) => (
+                    <li
+                      key={grupo.key}
+                      className="flex items-center justify-between gap-2 text-xs text-muted"
+                    >
+                      <span className="shrink-0">{etiquetaFecha(grupo.fecha)}</span>
+                      <span className="text-right text-foreground">
+                        {grupo.entradas
+                          .slice()
+                          .reverse()
+                          .map((r) => `${r.peso_kg}kg${r.reps ? `×${r.reps}` : ""}`)
+                          .join(" · ")}
+                      </span>
+                    </li>
+                  ))}
               </ul>
             </div>
           )}
