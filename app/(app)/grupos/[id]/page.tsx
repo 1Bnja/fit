@@ -1,28 +1,45 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import GrupoHeader from "@/components/GrupoHeader";
+import Avatar from "@/components/Avatar";
+import { tiempoRelativo } from "@/lib/formato";
 import { Flame, ChartLine, Dumbbell } from "reicon-react";
 
 const DIA_LABEL = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+
+type Miembro = {
+  user_id: string;
+  nombre: string | null;
+  apellido: string | null;
+  avatar_url: string | null;
+};
 
 export default async function GrupoPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const supabase = await createClient();
 
-  const [{ data: grupo }, { data: miembros }] = await Promise.all([
+  const [{ data: grupo }, { data: miembrosRaw }] = await Promise.all([
     supabase.from("grupos").select("id, nombre, codigo").eq("id", id).single(),
-    supabase.from("grupo_miembros").select("user_id, profiles(nombre)").eq("grupo_id", id),
+    supabase
+      .from("grupo_miembros")
+      .select("user_id, profiles(nombre, apellido, avatar_url)")
+      .eq("grupo_id", id),
   ]);
 
   if (!grupo) notFound();
 
-  const memberIds = (miembros ?? []).map((m) => m.user_id);
-  const nombrePorId = new Map(
-    (miembros ?? []).map((m) => {
-      const perfil = Array.isArray(m.profiles) ? m.profiles[0] : m.profiles;
-      return [m.user_id, perfil?.nombre ?? "?"];
-    })
-  );
+  const miembros: Miembro[] = (miembrosRaw ?? []).map((m) => {
+    const perfil = Array.isArray(m.profiles) ? m.profiles[0] : m.profiles;
+    return {
+      user_id: m.user_id,
+      nombre: perfil?.nombre ?? null,
+      apellido: perfil?.apellido ?? null,
+      avatar_url: perfil?.avatar_url ?? null,
+    };
+  });
+
+  const memberIds = miembros.map((m) => m.user_id);
+  const porId = new Map(miembros.map((m) => [m.user_id, m]));
 
   const [{ data: actividad }, { data: rutinasGrupo }, { data: diasGrupo }, { data: progresoRaw }] =
     await Promise.all([
@@ -64,7 +81,7 @@ export default async function GrupoPage({ params }: { params: Promise<{ id: stri
 
   return (
     <div className="flex flex-col gap-6">
-      <GrupoHeader nombre={grupo.nombre} codigo={grupo.codigo} miembros={memberIds.length} />
+      <GrupoHeader nombre={grupo.nombre} codigo={grupo.codigo} miembros={miembros} />
 
       <section>
         <h2 className="mb-2 flex items-center gap-1.5 text-sm font-medium text-muted">
@@ -77,25 +94,26 @@ export default async function GrupoPage({ params }: { params: Promise<{ id: stri
           </p>
         ) : (
           <ul className="flex flex-col gap-2">
-            {actividad.map((a) => (
-              <li
-                key={a.id}
-                className="flex items-center justify-between rounded-2xl border border-border bg-surface p-3 text-sm"
-              >
-                <span>
-                  <span className="font-medium">{nombrePorId.get(a.user_id) ?? "?"}</span>{" "}
-                  <span className="text-muted">
-                    {a.ejercicio_nombre} · {a.peso_kg} kg{a.reps ? ` × ${a.reps}` : ""}
+            {actividad.map((a) => {
+              const m = porId.get(a.user_id);
+              return (
+                <li
+                  key={a.id}
+                  className="flex items-center gap-3 rounded-2xl border border-border bg-surface p-3 text-sm"
+                >
+                  <Avatar nombre={m?.nombre} apellido={m?.apellido} avatarUrl={m?.avatar_url} size={32} />
+                  <span className="min-w-0 flex-1">
+                    <span className="font-medium">{m?.nombre ?? "?"}</span>{" "}
+                    <span className="text-muted">
+                      {a.ejercicio_nombre} · {a.peso_kg} kg{a.reps ? ` × ${a.reps}` : ""}
+                    </span>
                   </span>
-                </span>
-                <span className="text-xs text-muted">
-                  {new Date(a.created_at).toLocaleDateString("es-CL", {
-                    day: "2-digit",
-                    month: "2-digit",
-                  })}
-                </span>
-              </li>
-            ))}
+                  <span className="shrink-0 text-xs text-muted">
+                    {tiempoRelativo(new Date(a.created_at))}
+                  </span>
+                </li>
+              );
+            })}
           </ul>
         )}
       </section>
@@ -110,22 +128,46 @@ export default async function GrupoPage({ params }: { params: Promise<{ id: stri
             Sin datos todavía.
           </p>
         ) : (
-          <ul className="flex flex-col gap-2">
-            {[...progresoPorEjercicio.entries()].map(([ejercicio, porMiembro]) => (
-              <li key={ejercicio} className="rounded-2xl border border-border bg-surface p-3 text-sm">
-                <p className="mb-2 font-medium">{ejercicio}</p>
-                <ul className="flex flex-col gap-1">
-                  {[...porMiembro.entries()].map(([uid, r]) => (
-                    <li key={uid} className="flex items-center justify-between text-xs text-muted">
-                      <span>{nombrePorId.get(uid) ?? "?"}</span>
-                      <span className="text-foreground">
-                        {r.peso_kg} kg{r.reps ? ` × ${r.reps}` : ""}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </li>
-            ))}
+          <ul className="flex flex-col gap-3">
+            {[...progresoPorEjercicio.entries()].map(([ejercicio, porMiembro]) => {
+              const maxPeso = Math.max(...[...porMiembro.values()].map((r) => r.peso_kg));
+              return (
+                <li key={ejercicio} className="rounded-2xl border border-border bg-surface p-3 text-sm">
+                  <p className="mb-3 font-medium">{ejercicio}</p>
+                  <ul className="flex flex-col gap-2.5">
+                    {[...porMiembro.entries()]
+                      .sort((a, b) => b[1].peso_kg - a[1].peso_kg)
+                      .map(([uid, r]) => {
+                        const m = porId.get(uid);
+                        return (
+                          <li key={uid} className="flex items-center gap-2.5">
+                            <Avatar
+                              nombre={m?.nombre}
+                              apellido={m?.apellido}
+                              avatarUrl={m?.avatar_url}
+                              size={24}
+                            />
+                            <div className="min-w-0 flex-1">
+                              <div className="mb-1 flex items-center justify-between text-xs">
+                                <span className="text-muted">{m?.nombre ?? "?"}</span>
+                                <span className="text-foreground">
+                                  {r.peso_kg} kg{r.reps ? ` × ${r.reps}` : ""}
+                                </span>
+                              </div>
+                              <div className="h-1.5 rounded-full bg-surface-2">
+                                <div
+                                  className="h-1.5 rounded-full bg-accent"
+                                  style={{ width: `${(r.peso_kg / maxPeso) * 100}%` }}
+                                />
+                              </div>
+                            </div>
+                          </li>
+                        );
+                      })}
+                  </ul>
+                </li>
+              );
+            })}
           </ul>
         )}
       </section>
@@ -141,24 +183,28 @@ export default async function GrupoPage({ params }: { params: Promise<{ id: stri
           </p>
         ) : (
           <ul className="flex flex-col gap-2">
-            {rutinasGrupo.map((r) => (
-              <li
-                key={r.id}
-                className="flex items-center justify-between rounded-2xl border border-border bg-surface p-3 text-sm"
-              >
-                <span>
-                  <span className="font-medium">{r.nombre}</span>{" "}
-                  <span className="text-muted">— {nombrePorId.get(r.user_id) ?? "?"}</span>
-                </span>
-                <span className="flex gap-1">
-                  {(diasPorRutina.get(r.id) ?? []).map((d) => (
-                    <span key={d} className="text-xs text-muted">
-                      {DIA_LABEL[d]}
-                    </span>
-                  ))}
-                </span>
-              </li>
-            ))}
+            {rutinasGrupo.map((r) => {
+              const m = porId.get(r.user_id);
+              return (
+                <li
+                  key={r.id}
+                  className="flex items-center gap-3 rounded-2xl border border-border bg-surface p-3 text-sm"
+                >
+                  <Avatar nombre={m?.nombre} apellido={m?.apellido} avatarUrl={m?.avatar_url} size={28} />
+                  <span className="min-w-0 flex-1">
+                    <span className="font-medium">{r.nombre}</span>{" "}
+                    <span className="text-muted">— {m?.nombre ?? "?"}</span>
+                  </span>
+                  <span className="flex shrink-0 gap-1">
+                    {(diasPorRutina.get(r.id) ?? []).map((d) => (
+                      <span key={d} className="text-xs text-muted">
+                        {DIA_LABEL[d]}
+                      </span>
+                    ))}
+                  </span>
+                </li>
+              );
+            })}
           </ul>
         )}
       </section>
