@@ -11,6 +11,7 @@ type Miembro = {
   user_id: string;
   nombre: string | null;
   apellido: string | null;
+  username: string | null;
   avatar_url: string | null;
 };
 
@@ -22,7 +23,7 @@ export default async function GrupoPage({ params }: { params: Promise<{ id: stri
     supabase.from("grupos").select("id, nombre, codigo").eq("id", id).single(),
     supabase
       .from("grupo_miembros")
-      .select("user_id, profiles(nombre, apellido, avatar_url)")
+      .select("user_id, profiles(nombre, apellido, username, avatar_url)")
       .eq("grupo_id", id),
   ]);
 
@@ -34,6 +35,7 @@ export default async function GrupoPage({ params }: { params: Promise<{ id: stri
       user_id: m.user_id,
       nombre: perfil?.nombre ?? null,
       apellido: perfil?.apellido ?? null,
+      username: perfil?.username ?? null,
       avatar_url: perfil?.avatar_url ?? null,
     };
   });
@@ -103,7 +105,7 @@ export default async function GrupoPage({ params }: { params: Promise<{ id: stri
                 >
                   <Avatar nombre={m?.nombre} apellido={m?.apellido} avatarUrl={m?.avatar_url} size={32} />
                   <span className="min-w-0 flex-1">
-                    <span className="font-medium">{m?.nombre ?? "?"}</span>{" "}
+                    <span className="font-medium">@{m?.username ?? "?"}</span>{" "}
                     <span className="text-muted">
                       {a.ejercicio_nombre} · {a.peso_kg} kg{a.reps ? ` × ${a.reps}` : ""}
                     </span>
@@ -149,7 +151,7 @@ export default async function GrupoPage({ params }: { params: Promise<{ id: stri
                             />
                             <div className="min-w-0 flex-1">
                               <div className="mb-1 flex items-center justify-between text-xs">
-                                <span className="text-muted">{m?.nombre ?? "?"}</span>
+                                <span className="text-muted">@{m?.username ?? "?"}</span>
                                 <span className="text-foreground">
                                   {r.peso_kg} kg{r.reps ? ` × ${r.reps}` : ""}
                                 </span>
@@ -193,7 +195,7 @@ export default async function GrupoPage({ params }: { params: Promise<{ id: stri
                   <Avatar nombre={m?.nombre} apellido={m?.apellido} avatarUrl={m?.avatar_url} size={28} />
                   <span className="min-w-0 flex-1">
                     <span className="font-medium">{r.nombre}</span>{" "}
-                    <span className="text-muted">— {m?.nombre ?? "?"}</span>
+                    <span className="text-muted">— @{m?.username ?? "?"}</span>
                   </span>
                   <span className="flex shrink-0 gap-1">
                     {(diasPorRutina.get(r.id) ?? []).map((d) => (
