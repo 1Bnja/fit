@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { logout } from "@/app/actions/auth";
 import NavTabs from "@/components/NavTabs";
-import { Logout, UserCircle } from "reicon-react";
+import { Logout, User } from "reicon-react";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -10,12 +10,20 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         <div className="mx-auto flex max-w-3xl items-center justify-between px-4 py-3">
           <span className="text-sm font-medium">Fit</span>
           <div className="flex items-center gap-4">
-            <Link href="/perfil" aria-label="Tu perfil" className="text-muted hover:text-foreground">
-              <UserCircle size={20} />
+            <Link
+              href="/perfil"
+              aria-label="Tu perfil"
+              className="flex items-center text-muted hover:text-foreground"
+            >
+              <User size={18} />
             </Link>
-            <form action={logout}>
-              <button type="submit" aria-label="Cerrar sesión" className="text-muted hover:text-foreground">
-                <Logout size={16} />
+            <form action={logout} className="flex items-center">
+              <button
+                type="submit"
+                aria-label="Cerrar sesión"
+                className="flex items-center text-muted hover:text-foreground"
+              >
+                <Logout size={18} />
               </button>
             </form>
           </div>

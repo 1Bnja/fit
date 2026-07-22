@@ -24,7 +24,7 @@ export default function PerfilForm({ perfil, email }: { perfil: Perfil; email: s
   const [fotoError, setFotoError] = useState<string | null>(null);
 
   return (
-    <form action={formAction} className="flex max-w-sm flex-col gap-4">
+    <form action={formAction} className="mx-auto flex w-full max-w-sm flex-col gap-4">
       <h1 className="text-xl font-medium">Tu perfil</h1>
 
       <label className="relative mx-auto cursor-pointer">
