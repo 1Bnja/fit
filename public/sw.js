@@ -1,7 +1,8 @@
-const CACHE = "fit-v1";
+const CACHE = "fit-static-v2";
+const CACHEABLE_DESTINATIONS = new Set(["font", "image", "script", "style"]);
 
 self.addEventListener("install", (event) => {
-  self.skipWaiting();
+  event.waitUntil(self.skipWaiting());
 });
 
 self.addEventListener("activate", (event) => {
@@ -14,15 +15,24 @@ self.addEventListener("activate", (event) => {
 });
 
 self.addEventListener("fetch", (event) => {
-  if (event.request.method !== "GET") return;
+  const { request } = event;
+  if (
+    request.method !== "GET" ||
+    new URL(request.url).origin !== self.location.origin ||
+    !CACHEABLE_DESTINATIONS.has(request.destination)
+  ) {
+    return;
+  }
 
   event.respondWith(
-    fetch(event.request)
-      .then((res) => {
-        const clone = res.clone();
-        caches.open(CACHE).then((cache) => cache.put(event.request, clone));
-        return res;
+    fetch(request)
+      .then(async (response) => {
+        if (response.ok) {
+          const cache = await caches.open(CACHE);
+          await cache.put(request, response.clone());
+        }
+        return response;
       })
-      .catch(() => caches.match(event.request))
+      .catch(async () => (await caches.match(request)) ?? Response.error())
   );
 });

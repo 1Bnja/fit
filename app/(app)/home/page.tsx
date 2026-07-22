@@ -1,4 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
+import { mascotaEstaInactiva } from "@/lib/mascota.mjs";
+import Mascota from "@/components/mascota/Mascota";
 import { Scale, Ruler, Flame, ChevronRight, Dumbbell } from "reicon-react";
 import Link from "next/link";
 
@@ -10,14 +12,29 @@ export default async function HomePage() {
 
   const hoy = new Date().getDay();
 
-  const [{ data: profile }, { data: rutinasHoy }] = await Promise.all([
-    supabase.from("profiles").select("nombre, peso_kg, estatura_cm").eq("id", user!.id).single(),
+  const [{ data: profile }, { data: rutinasHoy }, { data: ultimoRegistro }] = await Promise.all([
+    supabase
+      .from("profiles")
+      .select("nombre, peso_kg, estatura_cm, created_at")
+      .eq("id", user!.id)
+      .single(),
     supabase
       .from("rutina_dias")
       .select("rutinas(id, nombre)")
       .eq("user_id", user!.id)
       .eq("dia_semana", hoy),
+    supabase
+      .from("registros_ejercicio")
+      .select("created_at")
+      .eq("user_id", user!.id)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
   ]);
+
+  const mostrarTumba = mascotaEstaInactiva(
+    ultimoRegistro?.created_at ?? profile?.created_at
+  );
 
   return (
     <div className="flex flex-col gap-6">
@@ -34,6 +51,8 @@ export default async function HomePage() {
           </div>
         </div>
       </div>
+
+      <Mascota inactiva={mostrarTumba} />
 
       <div>
         <h2 className="mb-2 flex items-center gap-1.5 text-sm font-medium text-muted">
