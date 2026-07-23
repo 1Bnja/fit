@@ -205,7 +205,12 @@ export default function RutinaEditor({
                 Sin ejercicios todavía.
               </p>
             ) : (
-              <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+              <DndContext
+                id={`rutina-${rutinaId}`}
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+              >
                 <SortableContext items={ejercicios.map((e) => e.id)} strategy={verticalListSortingStrategy}>
                   <ul className="flex flex-col gap-2">
                     {ejercicios.map((e) => (
