@@ -49,3 +49,10 @@ proxy.ts               Sesion, proteccion de rutas y gate de onboarding
 - Convenciones del framework: `node_modules/next/dist/docs/`, obligatorio antes de cambiar codigo Next.js en este repositorio.
 
 Cuando la documentacion y el codigo difieran, el codigo y el esquema desplegado son la fuente de verdad. El archivo SQL representa el esquema esperado, pero el repositorio no contiene un historial de migraciones que pruebe el estado exacto de una instancia remota.
+# Documentación del proyecto
+
+Este directorio centraliza la documentación técnica y de producto de Fit.
+
+## Interfaz
+
+- [Login y registro](./AUTH-FRONTEND.md): rediseño visual, comportamiento responsive, estados e integración con autenticación.
