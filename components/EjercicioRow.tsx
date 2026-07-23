@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Weight, Trash, Check, ChevronDown } from "reicon-react";
+import { Weight, Trash, Check, ChevronDown, ArrowUp, ArrowDown } from "reicon-react";
 import { registrarPeso } from "@/app/actions/registros";
 import ProgresoChart from "@/components/ProgresoChart";
 
@@ -46,12 +46,20 @@ export default function EjercicioRow({
   ejercicioNombre,
   historial,
   onQuitar,
+  onMoverArriba,
+  onMoverAbajo,
+  esPrimero,
+  esUltimo,
 }: {
   rutinaId: string;
   ejercicioId: string;
   ejercicioNombre: string;
   historial: Registro[];
   onQuitar: () => void;
+  onMoverArriba: () => void;
+  onMoverAbajo: () => void;
+  esPrimero: boolean;
+  esUltimo: boolean;
 }) {
   const router = useRouter();
   const [, startTransition] = useTransition();
@@ -94,14 +102,34 @@ export default function EjercicioRow({
             )}
           </span>
         </button>
-        <button
-          type="button"
-          onClick={onQuitar}
-          aria-label="Quitar ejercicio"
-          className="flex h-8 w-8 items-center justify-center rounded-lg text-muted hover:bg-surface-2 hover:text-danger"
-        >
-          <Trash size={16} />
-        </button>
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            onClick={onMoverArriba}
+            disabled={esPrimero}
+            aria-label="Mover arriba"
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-muted hover:bg-surface-2 hover:text-foreground disabled:opacity-30 disabled:hover:bg-transparent"
+          >
+            <ArrowUp size={16} />
+          </button>
+          <button
+            type="button"
+            onClick={onMoverAbajo}
+            disabled={esUltimo}
+            aria-label="Mover abajo"
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-muted hover:bg-surface-2 hover:text-foreground disabled:opacity-30 disabled:hover:bg-transparent"
+          >
+            <ArrowDown size={16} />
+          </button>
+          <button
+            type="button"
+            onClick={onQuitar}
+            aria-label="Quitar ejercicio"
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-muted hover:bg-surface-2 hover:text-danger"
+          >
+            <Trash size={16} />
+          </button>
+        </div>
       </div>
 
       {abierto && (

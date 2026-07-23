@@ -11,6 +11,7 @@ import {
   asignarDias,
   agregarEjercicios,
   quitarEjercicio,
+  moverEjercicio,
   crearEjercicioCustom,
   eliminarRutina,
 } from "@/app/actions/rutinas";
@@ -68,6 +69,13 @@ export default function RutinaEditor({
   function quitar(id: string) {
     startTransition(async () => {
       await quitarEjercicio(rutinaId, id);
+      router.refresh();
+    });
+  }
+
+  function mover(id: string, direccion: "arriba" | "abajo") {
+    startTransition(async () => {
+      await moverEjercicio(rutinaId, id, direccion);
       router.refresh();
     });
   }
@@ -166,7 +174,7 @@ export default function RutinaEditor({
               </p>
             ) : (
               <ul className="flex flex-col gap-2">
-                {ejerciciosIniciales.map((e) => (
+                {ejerciciosIniciales.map((e, i) => (
                   <EjercicioRow
                     key={e.id}
                     rutinaId={rutinaId}
@@ -174,6 +182,10 @@ export default function RutinaEditor({
                     ejercicioNombre={e.ejercicio_nombre}
                     historial={historialPorEjercicio[e.ejercicio_id] ?? []}
                     onQuitar={() => quitar(e.id)}
+                    onMoverArriba={() => mover(e.id, "arriba")}
+                    onMoverAbajo={() => mover(e.id, "abajo")}
+                    esPrimero={i === 0}
+                    esUltimo={i === ejerciciosIniciales.length - 1}
                   />
                 ))}
               </ul>
