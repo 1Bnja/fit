@@ -58,17 +58,27 @@ export default function EjercicioRow({
   const [abierto, setAbierto] = useState(false);
   const [peso, setPeso] = useState("");
   const [reps, setReps] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
   function guardar() {
     const pesoKg = Number(peso);
-    if (!pesoKg) return;
+    const repsNumero = Number(reps);
+    if (!pesoKg || !repsNumero) {
+      setError("Ingresa peso y repeticiones.");
+      return;
+    }
 
     startTransition(async () => {
-      await registrarPeso(rutinaId, ejercicioId, ejercicioNombre, pesoKg, reps ? Number(reps) : null);
+      const result = await registrarPeso(rutinaId, ejercicioId, ejercicioNombre, pesoKg, repsNumero);
+      if (result.error) {
+        setError(result.error);
+        return;
+      }
+      setError(null);
       router.refresh();
+      setPeso("");
+      setReps("");
     });
-    setPeso("");
-    setReps("");
   }
 
   const ultimo = historial[0];
@@ -125,7 +135,7 @@ export default function EjercicioRow({
                 min="0"
                 value={reps}
                 onChange={(ev) => setReps(ev.target.value)}
-                placeholder="Opcional"
+                placeholder="Requeridas"
               />
             </label>
             <button
@@ -138,6 +148,8 @@ export default function EjercicioRow({
               <Check size={16} />
             </button>
           </div>
+
+          {error && <p className="text-xs text-danger">{error}</p>}
 
           {historial.length > 0 && (
             <div className="flex flex-col gap-1.5">

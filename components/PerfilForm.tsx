@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { User, AtSign, Scale, Ruler, Camera } from "reicon-react";
+import { User, AtSign, Scale, Ruler, Camera, Dumbbell } from "reicon-react";
 import Field from "@/components/Field";
 import Avatar from "@/components/Avatar";
 import { actualizarPerfil, type PerfilState } from "@/app/actions/perfil";
@@ -13,6 +13,7 @@ type Perfil = {
   peso_kg: number | null;
   estatura_cm: number | null;
   avatar_url: string | null;
+  nivel_entrenamiento: "principiante" | "intermedio" | "avanzado" | null;
 } | null;
 
 const initialState: PerfilState = {};
@@ -67,6 +68,14 @@ export default function PerfilForm({ perfil, email }: { perfil: Perfil; email: s
           <input name="apellido" type="text" defaultValue={perfil?.apellido ?? ""} />
         </Field>
       </div>
+
+      <Field label="Nivel de entrenamiento" icon={<Dumbbell size={16} />}>
+        <select name="nivel_entrenamiento" defaultValue={perfil?.nivel_entrenamiento ?? "principiante"}>
+          <option value="principiante">Principiante · 2 series</option>
+          <option value="intermedio">Intermedio · 3 series</option>
+          <option value="avanzado">Avanzado · 3 series</option>
+        </select>
+      </Field>
 
       <Field label="Usuario" icon={<AtSign size={16} />}>
         <input name="username" type="text" defaultValue={perfil?.username ?? ""} required />

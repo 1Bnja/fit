@@ -1,5 +1,7 @@
 import Image from "next/image";
 import styles from "./Mascota.module.css";
+import MisionCard from "./MisionCard";
+import type { MisionAsignada } from "@/lib/misiones";
 
 const STAT_LABELS = {
   piernas: "Piernas",
@@ -19,6 +21,9 @@ type MascotaProps = {
   inactiva: boolean;
   progreso: number;
   stats: Record<Stat, number>;
+  misionesDiarias: MisionAsignada[];
+  misionesSemanales: MisionAsignada[];
+  minimoStatSiguiente: number;
 };
 
 export default function Mascota({
@@ -29,6 +34,9 @@ export default function Mascota({
   inactiva,
   progreso,
   stats,
+  misionesDiarias,
+  misionesSemanales,
+  minimoStatSiguiente,
 }: MascotaProps) {
   return (
     <>
@@ -116,15 +124,36 @@ export default function Mascota({
         )}
 
         <dl className="mt-4 flex flex-col gap-2">
-          {(Object.entries(STAT_LABELS) as [Stat, string][]).map(([stat, label]) => (
-            <div
-              key={stat}
-              className="flex items-center justify-between rounded-xl bg-surface-2 px-4 py-3 text-sm"
-            >
-              <dt>{label}</dt>
-              <dd className="font-medium text-accent">{stats[stat]}</dd>
-            </div>
-          ))}
+          {(Object.entries(STAT_LABELS) as [Stat, string][]).map(([stat, label]) => {
+            const puntos = stats[stat];
+            const requisito = Math.max(minimoStatSiguiente, 1);
+            const porcentaje =
+              minimoStatSiguiente > 0 ? Math.min(100, (puntos / requisito) * 100) : 0;
+
+            return (
+              <div
+                key={stat}
+                className="relative flex items-center justify-between overflow-hidden rounded-xl bg-surface-2 px-4 py-3 text-sm"
+              >
+                <div
+                  role="progressbar"
+                  aria-label={`Progreso de ${label}`}
+                  aria-valuemin={0}
+                  aria-valuemax={requisito}
+                  aria-valuenow={Math.min(puntos, requisito)}
+                  aria-valuetext={
+                    minimoStatSiguiente > 0
+                      ? `${puntos} puntos de ${requisito} requeridos`
+                      : `${puntos} puntos; requisito no configurado`
+                  }
+                  className="pointer-events-none absolute inset-y-0 left-0 bg-accent opacity-60 transition-[width]"
+                  style={{ width: `${porcentaje}%` }}
+                />
+                <dt className="relative font-medium">{label}</dt>
+                <dd className="relative font-medium">{puntos}</dd>
+              </div>
+            );
+          })}
         </dl>
       </div>
 
@@ -144,25 +173,47 @@ export default function Mascota({
           <span className="text-sm font-medium text-accent">{progreso}%</span>
         </div>
 
-        <progress
+        <div
+          role="progressbar"
           aria-label="Progreso para la siguiente evolución"
-          value={progreso}
-          max={100}
-          className="h-2 w-full accent-accent"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={progreso}
+          className="h-3 w-full overflow-hidden rounded-full bg-surface-2"
         >
-          {progreso}%
-        </progress>
+          <div
+            className="h-full rounded-full bg-accent transition-[width]"
+            style={{ width: `${progreso}%` }}
+          />
+        </div>
 
         <div className="grid gap-3 sm:grid-cols-2">
           <div className="rounded-xl border border-border bg-surface-2 p-4">
             <h3 className="text-sm font-medium">Metas diarias</h3>
-            <p className="mt-2 text-sm text-muted">Aún no hay metas diarias.</p>
+            {!misionesDiarias.length ? (
+              <p className="mt-2 text-sm text-muted">Día de descanso: no tienes rutina asignada.</p>
+            ) : (
+              <div className="mt-3 flex flex-col gap-2">
+                {misionesDiarias.map((mision) => (
+                  <MisionCard key={mision.id} mision={mision} registrable />
+                ))}
+              </div>
+            )}
           </div>
           <div className="rounded-xl border border-border bg-surface-2 p-4">
             <h3 className="text-sm font-medium">Metas semanales</h3>
-            <p className="mt-2 text-sm text-muted">Aún no hay metas semanales.</p>
+            {!misionesSemanales.length ? (
+              <p className="mt-2 text-sm text-muted">Crea y programa una rutina para obtener metas.</p>
+            ) : (
+              <div className="mt-3 flex flex-col gap-2">
+                {misionesSemanales.map((mision) => (
+                  <MisionCard key={mision.id} mision={mision} />
+                ))}
+              </div>
+            )}
           </div>
         </div>
+
       </section>
     </>
   );

@@ -1,5 +1,12 @@
 import { createClient } from "@/lib/supabase/server";
 import { mascotaEstaInactiva, obtenerEvolucionMascota } from "@/lib/mascota.mjs";
+import {
+  asegurarMisionesActuales,
+  periodosActuales,
+  type MisionAsignada,
+  type NivelEntrenamiento,
+  type StatMascota,
+} from "@/lib/misiones";
 import Mascota from "@/components/mascota/Mascota";
 import { Scale, Ruler, Flame, ChevronRight, Dumbbell } from "reicon-react";
 import Link from "next/link";
@@ -15,7 +22,7 @@ export default async function HomePage() {
   const [{ data: profile }, { data: rutinasHoy }, { data: mascotaUsuario }] = await Promise.all([
     supabase
       .from("profiles")
-      .select("nombre, peso_kg, estatura_cm, created_at, last_active_at")
+      .select("nombre, peso_kg, estatura_cm, created_at, last_active_at, nivel_entrenamiento, timezone")
       .eq("id", user!.id)
       .single(),
     supabase
@@ -40,6 +47,7 @@ export default async function HomePage() {
             numero,
             nombre,
             xp_requerida,
+            stat_minima_requerida,
             imagen_url
           )
         )
@@ -52,10 +60,32 @@ export default async function HomePage() {
   const mascota = Array.isArray(mascotaUsuario?.mascotas)
     ? mascotaUsuario.mascotas[0]
     : mascotaUsuario?.mascotas;
+  const fasesMascota = mascota?.mascota_fases ?? [];
+  const imagenInicial = [...fasesMascota].sort((a, b) => a.numero - b.numero)[0]?.imagen_url ?? null;
+  const stats = {
+    piernas: mascotaUsuario?.piernas ?? 0,
+    brazos: mascotaUsuario?.brazos ?? 0,
+    pecho: mascotaUsuario?.pecho ?? 0,
+    abdomen: mascotaUsuario?.abdomen ?? 0,
+    espalda: mascotaUsuario?.espalda ?? 0,
+  } satisfies Record<StatMascota, number>;
+  await asegurarMisionesActuales(supabase, user!.id, {
+    nivel: (profile?.nivel_entrenamiento ?? "principiante") as NivelEntrenamiento,
+    timezone: profile?.timezone ?? "America/Santiago",
+  });
+  const periodos = periodosActuales(profile?.timezone ?? "America/Santiago");
+  const { data: misiones } = await supabase
+    .from("usuario_misiones")
+    .select("id, frecuencia, ejercicio_id, ejercicio_nombre, stat, series_objetivo, dias_objetivo, dias_completados, reps_objetivo, peso_sugerido_kg, progreso, puntos_evolucion, puntos_stat, completada_at")
+    .eq("user_id", user!.id)
+    .in("periodo_inicio", [periodos.hoy, periodos.semana])
+    .order("frecuencia")
+    .order("slot");
   const xp = mascotaUsuario?.xp ?? 0;
-  const { faseActual, progreso } = obtenerEvolucionMascota(
-    mascota?.mascota_fases ?? [],
-    xp
+  const { faseActual, siguiente, progreso } = obtenerEvolucionMascota(
+    fasesMascota,
+    xp,
+    stats
   );
   const mostrarTumba =
     mascotaUsuario?.estado === "tumba" ||
@@ -81,16 +111,15 @@ export default async function HomePage() {
         clave={mascota?.clave ?? "ovejita"}
         nombre={mascota?.nombre ?? "Ovejita"}
         fase={faseActual?.nombre ?? "Fase inicial"}
-        imagenUrl={faseActual?.imagen_url ?? null}
+        imagenUrl={faseActual?.imagen_url ?? imagenInicial}
         inactiva={mostrarTumba}
         progreso={progreso}
-        stats={{
-          piernas: mascotaUsuario?.piernas ?? 0,
-          brazos: mascotaUsuario?.brazos ?? 0,
-          pecho: mascotaUsuario?.pecho ?? 0,
-          abdomen: mascotaUsuario?.abdomen ?? 0,
-          espalda: mascotaUsuario?.espalda ?? 0,
-        }}
+        stats={stats}
+        misionesDiarias={((misiones ?? []).filter((mision) => mision.frecuencia === "diaria") as MisionAsignada[])}
+        misionesSemanales={((misiones ?? []).filter((mision) => mision.frecuencia === "semanal") as MisionAsignada[])}
+        minimoStatSiguiente={
+          siguiente?.stat_minima_requerida ?? faseActual?.stat_minima_requerida ?? 0
+        }
       />
 
       <div>

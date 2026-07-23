@@ -15,9 +15,13 @@ export async function actualizarPerfil(
   const username = String(formData.get("username") ?? "").trim();
   const pesoKg = Number(formData.get("peso_kg"));
   const estaturaCm = Number(formData.get("estatura_cm"));
+  const nivelEntrenamiento = String(formData.get("nivel_entrenamiento") ?? "principiante");
   const foto = formData.get("foto");
 
   if (!nombre || !username) return { error: "Nombre y usuario son obligatorios." };
+  if (!["principiante", "intermedio", "avanzado"].includes(nivelEntrenamiento)) {
+    return { error: "El nivel de entrenamiento no es válido." };
+  }
 
   const supabase = await createClient();
   const {
@@ -25,7 +29,12 @@ export async function actualizarPerfil(
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const update: Record<string, unknown> = { nombre, apellido, username };
+  const update: Record<string, unknown> = {
+    nombre,
+    apellido,
+    username,
+    nivel_entrenamiento: nivelEntrenamiento,
+  };
   if (pesoKg) update.peso_kg = pesoKg;
   if (estaturaCm) update.estatura_cm = estaturaCm;
 

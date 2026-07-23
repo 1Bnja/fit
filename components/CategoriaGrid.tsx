@@ -9,6 +9,7 @@ const FALLBACK_ICON: Record<Categoria, typeof Dumbbell> = {
   espalda: Dumbbell2,
   brazos: Dumbbell3,
   piernas: Run,
+  abdomen: Dumbbell,
 };
 
 function CategoriaIcon({ categoria }: { categoria: Categoria }) {
@@ -40,7 +41,7 @@ export default function CategoriaGrid({
   onSelect: (categoria: Categoria) => void;
 }) {
   return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
       {CATEGORIAS.map((categoria) => (
         <button
           key={categoria}

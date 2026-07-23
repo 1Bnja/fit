@@ -9,6 +9,10 @@ export interface Exercise {
 
 const exercises = raw as Exercise[];
 
+export function getExercises(): Exercise[] {
+  return exercises;
+}
+
 export function exercisesByCategoria(categoria: Categoria): Exercise[] {
   return exercises.filter((e) => e.categoria === categoria);
 }

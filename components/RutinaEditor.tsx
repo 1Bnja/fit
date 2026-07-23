@@ -76,7 +76,7 @@ export default function RutinaEditor({
     if (!categoriaActiva) return;
     const ejercicios = exercisesByCategoria(categoriaActiva)
       .filter((e) => seleccionados.has(e.id))
-      .map((e) => ({ id: e.id, nombre: e.nombre, esCustom: false }));
+      .map((e) => ({ id: e.id, nombre: e.nombre, esCustom: false, categoria: e.categoria }));
 
     startTransition(async () => {
       await agregarEjercicios(rutinaId, ejercicios);
