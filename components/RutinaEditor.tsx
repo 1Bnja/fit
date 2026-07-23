@@ -2,6 +2,16 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import { SortableContext, verticalListSortingStrategy, arrayMove } from "@dnd-kit/sortable";
 import { Plus, Calendar, List, X, Trash } from "reicon-react";
 import CategoriaGrid from "@/components/CategoriaGrid";
 import EjercicioRow, { type Registro } from "@/components/EjercicioRow";
@@ -11,7 +21,7 @@ import {
   asignarDias,
   agregarEjercicios,
   quitarEjercicio,
-  moverEjercicio,
+  reordenarEjercicios,
   crearEjercicioCustom,
   eliminarRutina,
 } from "@/app/actions/rutinas";
@@ -55,6 +65,17 @@ export default function RutinaEditor({
   const [categoriaActiva, setCategoriaActiva] = useState<Categoria | null>(null);
   const [seleccionados, setSeleccionados] = useState(new Set<string>());
   const [customNombre, setCustomNombre] = useState("");
+  const [ejercicios, setEjercicios] = useState(ejerciciosIniciales);
+  const [prevEjerciciosIniciales, setPrevEjerciciosIniciales] = useState(ejerciciosIniciales);
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 150, tolerance: 5 } })
+  );
+
+  if (ejerciciosIniciales !== prevEjerciciosIniciales) {
+    setPrevEjerciciosIniciales(ejerciciosIniciales);
+    setEjercicios(ejerciciosIniciales);
+  }
 
   function toggleDia(dia: number) {
     const next = new Set(dias);
@@ -73,9 +94,20 @@ export default function RutinaEditor({
     });
   }
 
-  function mover(id: string, direccion: "arriba" | "abajo") {
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = ejercicios.findIndex((e) => e.id === active.id);
+    const newIndex = ejercicios.findIndex((e) => e.id === over.id);
+    const reordenado = arrayMove(ejercicios, oldIndex, newIndex);
+    setEjercicios(reordenado);
+
     startTransition(async () => {
-      await moverEjercicio(rutinaId, id, direccion);
+      await reordenarEjercicios(
+        rutinaId,
+        reordenado.map((e) => e.id)
+      );
       router.refresh();
     });
   }
@@ -168,27 +200,28 @@ export default function RutinaEditor({
 
         {vista === "lista" && (
           <>
-            {!ejerciciosIniciales.length ? (
+            {!ejercicios.length ? (
               <p className="rounded-2xl border border-border bg-surface p-4 text-sm text-muted">
                 Sin ejercicios todavía.
               </p>
             ) : (
-              <ul className="flex flex-col gap-2">
-                {ejerciciosIniciales.map((e, i) => (
-                  <EjercicioRow
-                    key={e.id}
-                    rutinaId={rutinaId}
-                    ejercicioId={e.ejercicio_id}
-                    ejercicioNombre={e.ejercicio_nombre}
-                    historial={historialPorEjercicio[e.ejercicio_id] ?? []}
-                    onQuitar={() => quitar(e.id)}
-                    onMoverArriba={() => mover(e.id, "arriba")}
-                    onMoverAbajo={() => mover(e.id, "abajo")}
-                    esPrimero={i === 0}
-                    esUltimo={i === ejerciciosIniciales.length - 1}
-                  />
-                ))}
-              </ul>
+              <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                <SortableContext items={ejercicios.map((e) => e.id)} strategy={verticalListSortingStrategy}>
+                  <ul className="flex flex-col gap-2">
+                    {ejercicios.map((e) => (
+                      <EjercicioRow
+                        key={e.id}
+                        id={e.id}
+                        rutinaId={rutinaId}
+                        ejercicioId={e.ejercicio_id}
+                        ejercicioNombre={e.ejercicio_nombre}
+                        historial={historialPorEjercicio[e.ejercicio_id] ?? []}
+                        onQuitar={() => quitar(e.id)}
+                      />
+                    ))}
+                  </ul>
+                </SortableContext>
+              </DndContext>
             )}
           </>
         )}

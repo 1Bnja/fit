@@ -91,32 +91,13 @@ export async function quitarEjercicio(rutinaId: string, rutinaEjercicioId: strin
   revalidatePath(`/rutinas/${rutinaId}`);
 }
 
-export async function moverEjercicio(
-  rutinaId: string,
-  rutinaEjercicioId: string,
-  direccion: "arriba" | "abajo"
-) {
+export async function reordenarEjercicios(rutinaId: string, idsEnOrden: string[]) {
   const supabase = await createClient();
-  const { data: ejercicios } = await supabase
-    .from("rutina_ejercicios")
-    .select("id, orden")
-    .eq("rutina_id", rutinaId)
-    .order("orden", { ascending: true });
-
-  if (!ejercicios) return;
-
-  const idx = ejercicios.findIndex((e) => e.id === rutinaEjercicioId);
-  const otroIdx = direccion === "arriba" ? idx - 1 : idx + 1;
-  if (idx === -1 || otroIdx < 0 || otroIdx >= ejercicios.length) return;
-
-  const actual = ejercicios[idx];
-  const otro = ejercicios[otroIdx];
-
-  await Promise.all([
-    supabase.from("rutina_ejercicios").update({ orden: otro.orden }).eq("id", actual.id),
-    supabase.from("rutina_ejercicios").update({ orden: actual.orden }).eq("id", otro.id),
-  ]);
-
+  await Promise.all(
+    idsEnOrden.map((id, orden) =>
+      supabase.from("rutina_ejercicios").update({ orden }).eq("id", id)
+    )
+  );
   revalidatePath(`/rutinas/${rutinaId}`);
 }
 
