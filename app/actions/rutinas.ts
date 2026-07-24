@@ -91,6 +91,16 @@ export async function quitarEjercicio(rutinaId: string, rutinaEjercicioId: strin
   revalidatePath(`/rutinas/${rutinaId}`);
 }
 
+export async function reordenarEjercicios(rutinaId: string, idsEnOrden: string[]) {
+  const supabase = await createClient();
+  await Promise.all(
+    idsEnOrden.map((id, orden) =>
+      supabase.from("rutina_ejercicios").update({ orden }).eq("id", id)
+    )
+  );
+  revalidatePath(`/rutinas/${rutinaId}`);
+}
+
 export async function crearEjercicioCustom(
   rutinaId: string,
   nombre: string,
