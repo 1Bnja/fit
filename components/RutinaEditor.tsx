@@ -79,7 +79,8 @@ export default function RutinaEditor({
 
   function toggleDia(dia: number) {
     const next = new Set(dias);
-    next.has(dia) ? next.delete(dia) : next.add(dia);
+    if (next.has(dia)) next.delete(dia);
+    else next.add(dia);
     setDias(next);
     startTransition(async () => {
       await asignarDias(rutinaId, [...next]);
@@ -268,7 +269,8 @@ export default function RutinaEditor({
                         checked={checked}
                         onChange={() => {
                           const next = new Set(seleccionados);
-                          next.has(e.id) ? next.delete(e.id) : next.add(e.id);
+                          if (next.has(e.id)) next.delete(e.id);
+                          else next.add(e.id);
                           setSeleccionados(next);
                         }}
                       />
