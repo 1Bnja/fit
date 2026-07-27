@@ -5,13 +5,14 @@
 -- ya no significan lo mismo (brazos-1 era "Laterales", que es hombro), hay que
 -- reasignarlos explícitamente o el historial se pega al ejercicio equivocado.
 
-begin;
-
+-- Sin begin/commit explícitos: la corre el runner de migraciones, que ya envuelve
+-- todo en una transacción. Por eso la tabla temporal se dropea a mano al final y
+-- no con "on commit drop", que la mataría antes de tiempo si no hubiera envoltura.
 create temp table mapeo_ejercicios (
   viejo text primary key,
   nuevo text not null,
   musculo text not null
-) on commit drop;
+);
 
 insert into mapeo_ejercicios (viejo, nuevo, musculo) values
   ('pecho-1', 'press-banca-barra', 'pecho'),
@@ -88,4 +89,4 @@ create index if not exists registros_ejercicio_musculo_idx
 alter table rutina_ejercicios drop column if exists es_custom;
 drop table if exists ejercicios_custom;
 
-commit;
+drop table mapeo_ejercicios;
