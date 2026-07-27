@@ -28,13 +28,11 @@ Extension uno-a-uno de `auth.users`. Guarda nombre, apellido, `username` unico, 
 
 Cabecera de rutina con propietario, nombre y fecha de creacion. Sus ejercicios y dias se eliminan por cascada.
 
-### `ejercicios_custom`
-
-Catalogo privado de ejercicios creados por el usuario. Guarda nombre y categoria. No tiene referencia directa desde `rutina_ejercicios`; la relacion se conserva como texto en `ejercicio_id`.
-
 ### `rutina_ejercicios`
 
-Detalle desnormalizado de una rutina: ID logico del ejercicio, nombre, indicador custom y orden. Esta decision permite mezclar ejercicios JSON y ejercicios SQL sin una tabla catalogo comun.
+Detalle desnormalizado de una rutina: ID logico del ejercicio, nombre y orden. El ID apunta al catalogo estatico de `data/exercises.json`, no a una tabla; el nombre va copiado para que la rutina siga siendo legible si el ejercicio sale del catalogo.
+
+No existen ejercicios creados por el usuario. Se eliminaron junto con la tabla `ejercicios_custom` en la migracion `2026-07-26-catalogo-ejercicios.sql`: un ejercicio inventado por una persona no es comparable con el de nadie mas, asi que no puede participar de los rankeds por musculo.
 
 ### `rutina_dias`
 
@@ -42,7 +40,9 @@ Relacion entre rutina, usuario y dia semanal (`0..6`). No existe una restriccion
 
 ### `registros_ejercicio`
 
-Serie historica con usuario, ID y nombre del ejercicio, peso, repeticiones opcionales y timestamp. Tiene indice compuesto por usuario, ejercicio y fecha descendente.
+Serie historica con usuario, ID y nombre del ejercicio, musculo, peso, repeticiones opcionales y timestamp. Tiene indice compuesto por usuario, ejercicio y fecha descendente, y otro por musculo y usuario.
+
+`musculo` se congela al insertar, copiado del catalogo, en vez de resolverse al leer. Es lo que permitira agrupar por grupo muscular en SQL, ya que el catalogo vive en un JSON que Postgres no puede joinear, y evita que reclasificar un ejercicio reescriba el historial ya cargado. Queda nulo si el ejercicio no esta en el catalogo, y esas filas se excluyen de cualquier agregacion.
 
 ### `grupos`
 
@@ -65,13 +65,12 @@ No hay checks SQL para peso/repeticiones positivos, longitud de nombres, categor
 
 ## Row Level Security
 
-RLS esta habilitado en las ocho tablas publicas.
+RLS esta habilitado en las siete tablas publicas.
 
 | Recurso | Escritura | Lectura |
 | --- | --- | --- |
 | `profiles` | Solo el propio perfil | Propietario o usuario que comparte grupo |
 | `rutinas` | Solo propietario | Propietario o usuario que comparte grupo |
-| `ejercicios_custom` | Solo propietario | Solo propietario |
 | `rutina_ejercicios` | Solo si la rutina pertenece al usuario | Propietario o usuario que comparte grupo con el dueño |
 | `rutina_dias` | Solo propietario | Propietario o usuario que comparte grupo |
 | `registros_ejercicio` | Solo propietario | Propietario o usuario que comparte grupo |

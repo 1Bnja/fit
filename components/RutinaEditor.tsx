@@ -2,16 +2,20 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, Calendar, List, X, Trash } from "reicon-react";
+import { Plus, Calendar, List, X, Trash, ChevronDown, Search } from "reicon-react";
 import CategoriaGrid from "@/components/CategoriaGrid";
 import EjercicioRow, { type Registro } from "@/components/EjercicioRow";
-import { exercisesByCategoria } from "@/lib/exercises";
-import { CATEGORIA_LABEL, type Categoria } from "@/lib/categorias";
+import { buscar, exercisesByMusculo, type Exercise } from "@/lib/exercises";
+import {
+  CATEGORIA_LABEL,
+  MUSCULO_LABEL,
+  MUSCULOS_POR_CATEGORIA,
+  type Categoria,
+} from "@/lib/categorias";
 import {
   asignarDias,
   agregarEjercicios,
   quitarEjercicio,
-  crearEjercicioCustom,
   eliminarRutina,
 } from "@/app/actions/rutinas";
 
@@ -29,10 +33,43 @@ type RutinaEjercicio = {
   id: string;
   ejercicio_id: string;
   ejercicio_nombre: string;
-  es_custom: boolean;
 };
 
-type Vista = "lista" | "categorias" | "ejercicios" | "custom";
+type Vista = "lista" | "categorias" | "ejercicios";
+
+function ListaSeleccionable({
+  exercises,
+  seleccionados,
+  onToggle,
+}: {
+  exercises: Exercise[];
+  seleccionados: Set<string>;
+  onToggle: (id: string) => void;
+}) {
+  if (!exercises.length) {
+    return <p className="p-3 text-sm text-muted">Sin resultados.</p>;
+  }
+
+  return (
+    <ul className="flex flex-col gap-2">
+      {exercises.map((e) => {
+        const checked = seleccionados.has(e.id);
+        return (
+          <li key={e.id}>
+            <label
+              className={`flex items-center gap-3 rounded-2xl border p-3 text-sm ${
+                checked ? "border-accent bg-surface-2" : "border-border bg-surface"
+              }`}
+            >
+              <input type="checkbox" checked={checked} onChange={() => onToggle(e.id)} />
+              {e.nombre}
+            </label>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
 
 export default function RutinaEditor({
   rutinaId,
@@ -53,7 +90,7 @@ export default function RutinaEditor({
   const [vista, setVista] = useState<Vista>("lista");
   const [categoriaActiva, setCategoriaActiva] = useState<Categoria | null>(null);
   const [seleccionados, setSeleccionados] = useState(new Set<string>());
-  const [customNombre, setCustomNombre] = useState("");
+  const [query, setQuery] = useState("");
 
   function toggleDia(dia: number) {
     const next = new Set(dias);
@@ -72,28 +109,26 @@ export default function RutinaEditor({
     });
   }
 
-  function agregarSeleccionados() {
-    if (!categoriaActiva) return;
-    const ejercicios = exercisesByCategoria(categoriaActiva)
-      .filter((e) => seleccionados.has(e.id))
-      .map((e) => ({ id: e.id, nombre: e.nombre, esCustom: false }));
+  function toggleSeleccion(id: string) {
+    const next = new Set(seleccionados);
+    next.has(id) ? next.delete(id) : next.add(id);
+    setSeleccionados(next);
+  }
 
-    startTransition(async () => {
-      await agregarEjercicios(rutinaId, ejercicios);
-      router.refresh();
-    });
+  function cerrarSelector() {
     setSeleccionados(new Set());
+    setQuery("");
     setVista("lista");
   }
 
-  function crearCustom() {
-    if (!categoriaActiva || !customNombre.trim()) return;
+  function agregarSeleccionados() {
+    if (!seleccionados.size) return;
+    const ids = [...seleccionados];
     startTransition(async () => {
-      await crearEjercicioCustom(rutinaId, customNombre.trim(), categoriaActiva);
+      await agregarEjercicios(rutinaId, ids);
       router.refresh();
     });
-    setCustomNombre("");
-    setVista("lista");
+    cerrarSelector();
   }
 
   function eliminar() {
@@ -102,6 +137,22 @@ export default function RutinaEditor({
       await eliminarRutina(rutinaId);
     });
   }
+
+  const musculos = categoriaActiva ? MUSCULOS_POR_CATEGORIA[categoriaActiva] : [];
+
+  // La selección se guarda por id, así que sobrevive al cambiar de músculo o de
+  // categoría: puedes marcar en Bíceps, abrir Tríceps y agregar todo de una.
+  const botonAgregar = (
+    <button
+      type="button"
+      onClick={agregarSeleccionados}
+      disabled={!seleccionados.size}
+      className="flex items-center gap-1.5 rounded-xl bg-accent px-4 py-2 text-sm font-medium text-accent-foreground disabled:opacity-50"
+    >
+      <Plus size={14} />
+      Agregar{seleccionados.size ? ` (${seleccionados.size})` : ""}
+    </button>
+  );
 
   return (
     <div className="flex flex-col gap-6">
@@ -158,131 +209,119 @@ export default function RutinaEditor({
           )}
         </div>
 
-        {vista === "lista" && (
-          <>
-            {!ejerciciosIniciales.length ? (
-              <p className="rounded-2xl border border-border bg-surface p-4 text-sm text-muted">
-                Sin ejercicios todavía.
-              </p>
-            ) : (
-              <ul className="flex flex-col gap-2">
-                {ejerciciosIniciales.map((e) => (
-                  <EjercicioRow
-                    key={e.id}
-                    rutinaId={rutinaId}
-                    ejercicioId={e.ejercicio_id}
-                    ejercicioNombre={e.ejercicio_nombre}
-                    historial={historialPorEjercicio[e.ejercicio_id] ?? []}
-                    onQuitar={() => quitar(e.id)}
-                  />
-                ))}
-              </ul>
-            )}
-          </>
-        )}
+        {vista === "lista" &&
+          (!ejerciciosIniciales.length ? (
+            <p className="rounded-2xl border border-border bg-surface p-4 text-sm text-muted">
+              Sin ejercicios todavía.
+            </p>
+          ) : (
+            <ul className="flex flex-col gap-2">
+              {ejerciciosIniciales.map((e) => (
+                <EjercicioRow
+                  key={e.id}
+                  rutinaId={rutinaId}
+                  ejercicioId={e.ejercicio_id}
+                  ejercicioNombre={e.ejercicio_nombre}
+                  historial={historialPorEjercicio[e.ejercicio_id] ?? []}
+                  onQuitar={() => quitar(e.id)}
+                />
+              ))}
+            </ul>
+          ))}
 
         {vista === "categorias" && (
           <div className="flex flex-col gap-3">
-            <CategoriaGrid
-              onSelect={(categoria) => {
-                setCategoriaActiva(categoria);
-                setVista("ejercicios");
-              }}
-            />
-            <button
-              type="button"
-              onClick={() => setVista("lista")}
-              className="flex items-center gap-1.5 self-start text-sm text-muted hover:text-foreground"
-            >
-              <X size={14} />
-              Cancelar
-            </button>
+            <label className="flex items-center gap-2 rounded-2xl border border-border bg-surface px-3">
+              <Search size={16} className="shrink-0 text-muted" />
+              <input
+                type="search"
+                value={query}
+                onChange={(ev) => setQuery(ev.target.value)}
+                placeholder="Buscar ejercicio"
+                className="flex-1 border-0 bg-transparent p-0 py-3 focus:outline-none"
+              />
+            </label>
+
+            {query.trim() ? (
+              <>
+                <ListaSeleccionable
+                  exercises={buscar(query)}
+                  seleccionados={seleccionados}
+                  onToggle={toggleSeleccion}
+                />
+                <div className="flex gap-2">
+                  {botonAgregar}
+                  <button
+                    type="button"
+                    onClick={cerrarSelector}
+                    className="text-sm text-muted hover:text-foreground"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <CategoriaGrid
+                  onSelect={(categoria) => {
+                    setCategoriaActiva(categoria);
+                    setVista("ejercicios");
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={cerrarSelector}
+                  className="flex items-center gap-1.5 self-start text-sm text-muted hover:text-foreground"
+                >
+                  <X size={14} />
+                  Cancelar
+                </button>
+              </>
+            )}
           </div>
         )}
 
         {vista === "ejercicios" && categoriaActiva && (
           <div className="flex flex-col gap-3">
             <h3 className="text-sm text-muted">{CATEGORIA_LABEL[categoriaActiva]}</h3>
-            <ul className="flex flex-col gap-2">
-              {exercisesByCategoria(categoriaActiva).map((e) => {
-                const checked = seleccionados.has(e.id);
-                return (
-                  <li key={e.id}>
-                    <label
-                      className={`flex items-center gap-3 rounded-2xl border p-3 text-sm ${
-                        checked ? "border-accent bg-surface-2" : "border-border bg-surface"
-                      }`}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={checked}
-                        onChange={() => {
-                          const next = new Set(seleccionados);
-                          next.has(e.id) ? next.delete(e.id) : next.add(e.id);
-                          setSeleccionados(next);
-                        }}
-                      />
-                      {e.nombre}
-                    </label>
-                  </li>
-                );
-              })}
-            </ul>
 
-            <button
-              type="button"
-              onClick={() => setVista("custom")}
-              className="self-start text-sm text-accent"
-            >
-              No encuentro mi ejercicio
-            </button>
+            {musculos.length === 1 ? (
+              <ListaSeleccionable
+                exercises={exercisesByMusculo(musculos[0])}
+                seleccionados={seleccionados}
+                onToggle={toggleSeleccion}
+              />
+            ) : (
+              <div className="flex flex-col gap-2">
+                {musculos.map((musculo) => (
+                  <details
+                    key={musculo}
+                    className="group rounded-2xl border border-border bg-surface"
+                  >
+                    <summary className="flex cursor-pointer list-none items-center gap-2 p-3 text-sm">
+                      <ChevronDown
+                        size={14}
+                        className="text-muted transition-transform group-open:rotate-180"
+                      />
+                      {MUSCULO_LABEL[musculo]}
+                    </summary>
+                    <div className="border-t border-border p-3">
+                      <ListaSeleccionable
+                        exercises={exercisesByMusculo(musculo)}
+                        seleccionados={seleccionados}
+                        onToggle={toggleSeleccion}
+                      />
+                    </div>
+                  </details>
+                ))}
+              </div>
+            )}
 
             <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={agregarSeleccionados}
-                disabled={!seleccionados.size}
-                className="flex items-center gap-1.5 rounded-xl bg-accent px-4 py-2 text-sm font-medium text-accent-foreground disabled:opacity-50"
-              >
-                <Plus size={14} />
-                Agregar seleccionados
-              </button>
+              {botonAgregar}
               <button
                 type="button"
                 onClick={() => setVista("categorias")}
-                className="text-sm text-muted hover:text-foreground"
-              >
-                Volver
-              </button>
-            </div>
-          </div>
-        )}
-
-        {vista === "custom" && categoriaActiva && (
-          <div className="flex flex-col gap-3">
-            <h3 className="text-sm text-muted">
-              Nuevo ejercicio en {CATEGORIA_LABEL[categoriaActiva]}
-            </h3>
-            <input
-              type="text"
-              placeholder="Nombre del ejercicio"
-              value={customNombre}
-              onChange={(e) => setCustomNombre(e.target.value)}
-              autoFocus
-            />
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={crearCustom}
-                disabled={!customNombre.trim()}
-                className="flex items-center gap-1.5 rounded-xl bg-accent px-4 py-2 text-sm font-medium text-accent-foreground disabled:opacity-50"
-              >
-                <Plus size={14} />
-                Guardar y agregar
-              </button>
-              <button
-                type="button"
-                onClick={() => setVista("ejercicios")}
                 className="text-sm text-muted hover:text-foreground"
               >
                 Volver

@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import type { Categoria } from "@/lib/categorias";
+import { exerciseById } from "@/lib/exercises";
 
 export type FormState = { error?: string };
 
@@ -57,10 +57,12 @@ export async function asignarDias(rutinaId: string, dias: number[]) {
   revalidatePath(`/rutinas/${rutinaId}`);
 }
 
-export async function agregarEjercicios(
-  rutinaId: string,
-  ejercicios: { id: string; nombre: string; esCustom: boolean }[]
-) {
+export async function agregarEjercicios(rutinaId: string, ids: string[]) {
+  // El nombre sale del catálogo, no del cliente: es el que queda congelado en la
+  // fila si el ejercicio después se edita o se saca del catálogo.
+  const ejercicios = ids.map(exerciseById).filter((e) => e !== undefined);
+  if (!ejercicios.length) return;
+
   const supabase = await createClient();
 
   const { data: existentes } = await supabase
@@ -77,7 +79,6 @@ export async function agregarEjercicios(
       rutina_id: rutinaId,
       ejercicio_id: e.id,
       ejercicio_nombre: e.nombre,
-      es_custom: e.esCustom,
       orden: orden++,
     }))
   );
@@ -89,26 +90,4 @@ export async function quitarEjercicio(rutinaId: string, rutinaEjercicioId: strin
   const supabase = await createClient();
   await supabase.from("rutina_ejercicios").delete().eq("id", rutinaEjercicioId);
   revalidatePath(`/rutinas/${rutinaId}`);
-}
-
-export async function crearEjercicioCustom(
-  rutinaId: string,
-  nombre: string,
-  categoria: Categoria
-) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
-
-  const { data, error } = await supabase
-    .from("ejercicios_custom")
-    .insert({ user_id: user!.id, nombre, categoria })
-    .select("id")
-    .single();
-
-  if (error || !data) return;
-
-  await agregarEjercicios(rutinaId, [{ id: data.id, nombre, esCustom: true }]);
 }

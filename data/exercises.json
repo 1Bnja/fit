@@ -1,21 +1,1725 @@
 [
-  { "id": "pecho-1", "nombre": "Press Banca", "categoria": "pecho" },
-  { "id": "pecho-2", "nombre": "Press Inclinado", "categoria": "pecho" },
-  { "id": "pecho-3", "nombre": "Peck Deck", "categoria": "pecho" },
-  { "id": "espalda-1", "nombre": "Remo unilateral", "categoria": "espalda" },
-  { "id": "espalda-2", "nombre": "Remo T", "categoria": "espalda" },
-  { "id": "espalda-3", "nombre": "Jalón unilateral", "categoria": "espalda" },
-  { "id": "espalda-4", "nombre": "Jalón al Pecho", "categoria": "espalda" },
-  { "id": "brazos-1", "nombre": "Laterales", "categoria": "brazos" },
-  { "id": "brazos-2", "nombre": "Curl Biceps", "categoria": "brazos" },
-  { "id": "brazos-3", "nombre": "Extension de triceps", "categoria": "brazos" },
-  { "id": "brazos-4", "nombre": "Curl Bayesian", "categoria": "brazos" },
-  { "id": "brazos-5", "nombre": "Curl Preducador", "categoria": "brazos" },
-  { "id": "brazos-6", "nombre": "Curl Martillo", "categoria": "brazos" },
-  { "id": "brazos-7", "nombre": "Press Francés", "categoria": "brazos" },
-  { "id": "brazos-8", "nombre": "Triceps Katana", "categoria": "brazos" },
-  { "id": "piernas-1", "nombre": "Abductores", "categoria": "piernas" },
-  { "id": "piernas-2", "nombre": "Prensa", "categoria": "piernas" },
-  { "id": "piernas-3", "nombre": "Curl femoral", "categoria": "piernas" },
-  { "id": "piernas-4", "nombre": "Curl Cuadriceps", "categoria": "piernas" }
+  {
+    "id": "press-banca-barra",
+    "nombre": "Press de Banca con Barra",
+    "en": "Bench Press",
+    "musculo": "pecho",
+    "secundarios": [
+      "triceps",
+      "hombros"
+    ]
+  },
+  {
+    "id": "press-inclinado-barra",
+    "nombre": "Press Inclinado con Barra",
+    "en": "Incline Bench Press",
+    "musculo": "pecho",
+    "secundarios": [
+      "triceps",
+      "hombros"
+    ]
+  },
+  {
+    "id": "press-declinado-barra",
+    "nombre": "Press Declinado con Barra",
+    "en": "Decline Bench Press",
+    "musculo": "pecho",
+    "secundarios": [
+      "triceps",
+      "hombros"
+    ]
+  },
+  {
+    "id": "press-plano-mancuernas",
+    "nombre": "Press Plano con Mancuernas",
+    "en": "Dumbbell Bench Press",
+    "musculo": "pecho",
+    "secundarios": [
+      "triceps",
+      "hombros"
+    ]
+  },
+  {
+    "id": "press-inclinado-mancuernas",
+    "nombre": "Press Inclinado con Mancuernas",
+    "en": "Incline Dumbbell Press",
+    "musculo": "pecho",
+    "secundarios": [
+      "triceps",
+      "hombros"
+    ]
+  },
+  {
+    "id": "press-declinado-mancuernas",
+    "nombre": "Press Declinado con Mancuernas",
+    "en": "Decline Dumbbell Press",
+    "musculo": "pecho",
+    "secundarios": [
+      "triceps",
+      "hombros"
+    ]
+  },
+  {
+    "id": "press-pecho-maquina",
+    "nombre": "Press de Pecho en Máquina",
+    "en": "Machine Chest Press",
+    "musculo": "pecho",
+    "secundarios": [
+      "triceps",
+      "hombros"
+    ]
+  },
+  {
+    "id": "press-inclinado-maquina",
+    "nombre": "Press Inclinado en Máquina",
+    "en": "Incline Machine Press",
+    "musculo": "pecho",
+    "secundarios": [
+      "triceps",
+      "hombros"
+    ]
+  },
+  {
+    "id": "aperturas-pec-deck-contractora",
+    "nombre": "Aperturas en Pec Deck / Contractora",
+    "en": "Pec Deck Fly",
+    "musculo": "pecho",
+    "secundarios": [
+      "hombros"
+    ]
+  },
+  {
+    "id": "cruces-polea-alta-baja",
+    "nombre": "Cruces de Polea Alta a Baja",
+    "en": "High to Low Cable Fly",
+    "musculo": "pecho",
+    "secundarios": [
+      "hombros"
+    ]
+  },
+  {
+    "id": "cruces-polea-baja-alta",
+    "nombre": "Cruces de Polea Baja a Alta",
+    "en": "Low to High Cable Fly",
+    "musculo": "pecho",
+    "secundarios": [
+      "hombros"
+    ]
+  },
+  {
+    "id": "cruces-polea-horizontales",
+    "nombre": "Cruces de Polea Horizontales",
+    "en": "Cable Chest Fly",
+    "musculo": "pecho",
+    "secundarios": [
+      "hombros"
+    ]
+  },
+  {
+    "id": "aperturas-mancuernas-banco-plano",
+    "nombre": "Aperturas con Mancuernas en Banco Plano",
+    "en": "Dumbbell Fly",
+    "musculo": "pecho",
+    "secundarios": [
+      "hombros"
+    ]
+  },
+  {
+    "id": "aperturas-mancuernas-banco-inclinado",
+    "nombre": "Aperturas con Mancuernas en Banco Inclinado",
+    "en": "Incline Dumbbell Fly",
+    "musculo": "pecho",
+    "secundarios": [
+      "hombros"
+    ]
+  },
+  {
+    "id": "fondos-paralelas-pecho",
+    "nombre": "Fondos en Paralelas para Pecho",
+    "en": "Chest Dips",
+    "musculo": "pecho",
+    "secundarios": [
+      "triceps",
+      "hombros"
+    ]
+  },
+  {
+    "id": "fondos-asistidos-maquina",
+    "nombre": "Fondos Asistidos en Máquina",
+    "en": "Assisted Dips",
+    "musculo": "pecho",
+    "secundarios": [
+      "triceps",
+      "hombros"
+    ]
+  },
+  {
+    "id": "press-pecho-unilateral-polea",
+    "nombre": "Press de Pecho Unilateral en Polea",
+    "en": "Single-Arm Cable Chest Press",
+    "musculo": "pecho",
+    "secundarios": [
+      "triceps",
+      "hombros"
+    ]
+  },
+  {
+    "id": "press-inclinado-unilateral-mancuerna",
+    "nombre": "Press Inclinado Unilateral con Mancuerna",
+    "en": "Single-Arm Incline Dumbbell Press",
+    "musculo": "pecho",
+    "secundarios": [
+      "triceps",
+      "hombros"
+    ]
+  },
+  {
+    "id": "press-inclinado-polea",
+    "nombre": "Press Inclinado en Polea",
+    "en": "Incline Cable Press",
+    "musculo": "pecho",
+    "secundarios": [
+      "triceps",
+      "hombros"
+    ]
+  },
+  {
+    "id": "press-declinado-polea",
+    "nombre": "Press Declinado en Polea",
+    "en": "Decline Cable Press",
+    "musculo": "pecho",
+    "secundarios": [
+      "triceps",
+      "hombros"
+    ]
+  },
+  {
+    "id": "press-svend-disco",
+    "nombre": "Press Svend con Disco",
+    "en": "Svend Press",
+    "musculo": "pecho",
+    "secundarios": [
+      "hombros"
+    ]
+  },
+  {
+    "id": "pullover-mancuerna-pecho",
+    "nombre": "Pullover con Mancuerna para Pecho",
+    "en": "Dumbbell Pullover",
+    "musculo": "pecho",
+    "secundarios": [
+      "espalda",
+      "triceps"
+    ]
+  },
+  {
+    "id": "press-inclinado-multipower-smith",
+    "nombre": "Press Inclinado en Multipower / Smith",
+    "en": "Smith Machine Incline Press",
+    "musculo": "pecho",
+    "secundarios": [
+      "triceps",
+      "hombros"
+    ]
+  },
+  {
+    "id": "press-plano-multipower-smith",
+    "nombre": "Press Plano en Multipower / Smith",
+    "en": "Smith Machine Bench Press",
+    "musculo": "pecho",
+    "secundarios": [
+      "triceps",
+      "hombros"
+    ]
+  },
+  {
+    "id": "press-declinado-multipower-smith",
+    "nombre": "Press Declinado en Multipower / Smith",
+    "en": "Smith Machine Decline Press",
+    "musculo": "pecho",
+    "secundarios": [
+      "triceps",
+      "hombros"
+    ]
+  },
+  {
+    "id": "press-landmine-barra",
+    "nombre": "Press Landmine con Barra",
+    "en": "Landmine Chest Press",
+    "musculo": "pecho",
+    "secundarios": [
+      "triceps",
+      "hombros"
+    ]
+  },
+  {
+    "id": "aperturas-unilaterales-polea",
+    "nombre": "Aperturas Unilaterales en Polea",
+    "en": "Single-Arm Cable Fly",
+    "musculo": "pecho",
+    "secundarios": [
+      "hombros"
+    ]
+  },
+  {
+    "id": "press-inclinado-neutro-mancuernas",
+    "nombre": "Press Inclinado Neutro con Mancuernas",
+    "en": "Incline Neutral Grip Press",
+    "musculo": "pecho",
+    "secundarios": [
+      "triceps",
+      "hombros"
+    ]
+  },
+  {
+    "id": "press-guillotina",
+    "nombre": "Press Guillotina",
+    "en": "Guillotine Press",
+    "musculo": "pecho",
+    "secundarios": [
+      "triceps",
+      "hombros"
+    ]
+  },
+  {
+    "id": "press-neutro-banco-plano-mancuernas",
+    "nombre": "Press Neutro en Banco Plano con Mancuernas",
+    "en": "Flat Neutral Grip Dumbbell Press",
+    "musculo": "pecho",
+    "secundarios": [
+      "triceps",
+      "hombros"
+    ]
+  },
+  {
+    "id": "jalon-pecho",
+    "nombre": "Jalón al Pecho",
+    "en": "Lat Pulldown",
+    "musculo": "espalda",
+    "secundarios": [
+      "biceps",
+      "hombros"
+    ]
+  },
+  {
+    "id": "jalon-pecho-unilateral",
+    "nombre": "Jalón al Pecho Unilateral",
+    "en": "Single-Arm Lat Pulldown",
+    "musculo": "espalda",
+    "secundarios": [
+      "biceps",
+      "hombros"
+    ]
+  },
+  {
+    "id": "jalon-agarre-estrecho-neutro",
+    "nombre": "Jalón con Agarre Estrecho / Neutro",
+    "en": "Close-Grip Lat Pulldown",
+    "musculo": "espalda",
+    "secundarios": [
+      "biceps",
+      "hombros"
+    ]
+  },
+  {
+    "id": "jalon-agarre-invertido",
+    "nombre": "Jalón con Agarre Invertido",
+    "en": "Underhand Lat Pulldown",
+    "musculo": "espalda",
+    "secundarios": [
+      "biceps",
+      "hombros"
+    ]
+  },
+  {
+    "id": "remo-barra-t",
+    "nombre": "Remo en Barra T",
+    "en": "T-Bar Row",
+    "musculo": "espalda",
+    "secundarios": [
+      "biceps",
+      "hombros"
+    ]
+  },
+  {
+    "id": "remo-barra-inclinado",
+    "nombre": "Remo con Barra Inclinado",
+    "en": "Bent-Over Barbell Row",
+    "musculo": "espalda",
+    "secundarios": [
+      "biceps",
+      "hombros"
+    ]
+  },
+  {
+    "id": "remo-invertido-pendlay",
+    "nombre": "Remo Invertido / Pendlay",
+    "en": "Pendlay Row",
+    "musculo": "espalda",
+    "secundarios": [
+      "biceps",
+      "hombros"
+    ]
+  },
+  {
+    "id": "remo-mancuerna-mano",
+    "nombre": "Remo con Mancuerna a Una Mano",
+    "en": "Single-Arm Dumbbell Row",
+    "musculo": "espalda",
+    "secundarios": [
+      "biceps",
+      "hombros"
+    ]
+  },
+  {
+    "id": "remo-sentado-polea-baja",
+    "nombre": "Remo Sentado en Polea Baja",
+    "en": "Seated Cable Row",
+    "musculo": "espalda",
+    "secundarios": [
+      "biceps",
+      "hombros"
+    ]
+  },
+  {
+    "id": "remo-sentado-agarre-ancho",
+    "nombre": "Remo Sentado Agarre Ancho",
+    "en": "Wide-Grip Seated Row",
+    "musculo": "espalda",
+    "secundarios": [
+      "biceps",
+      "hombros"
+    ]
+  },
+  {
+    "id": "remo-alto-unilateral",
+    "nombre": "Remo Alto Unilateral",
+    "en": "Single-Arm High Row",
+    "musculo": "espalda",
+    "secundarios": [
+      "biceps",
+      "hombros"
+    ]
+  },
+  {
+    "id": "remo-maquina-hammer-strength",
+    "nombre": "Remo en Máquina Hammer Strength",
+    "en": "Lever Row / Iso-Lateral Row",
+    "musculo": "espalda",
+    "secundarios": [
+      "biceps",
+      "hombros"
+    ]
+  },
+  {
+    "id": "jalon-brazos-rectos-pullover-polea",
+    "nombre": "Jalón con Brazos Rectos / Pullover en Polea",
+    "en": "Straight-Arm Pulldown",
+    "musculo": "espalda",
+    "secundarios": [
+      "triceps"
+    ]
+  },
+  {
+    "id": "dominadas-pronadas",
+    "nombre": "Dominadas Pronadas",
+    "en": "Pull-Ups",
+    "musculo": "espalda",
+    "secundarios": [
+      "biceps",
+      "hombros"
+    ]
+  },
+  {
+    "id": "dominadas-supinas",
+    "nombre": "Dominadas Supinas",
+    "en": "Chin-Ups",
+    "musculo": "espalda",
+    "secundarios": [
+      "biceps",
+      "hombros"
+    ]
+  },
+  {
+    "id": "dominadas-agarre-neutro",
+    "nombre": "Dominadas Agarre Neutro",
+    "en": "Neutral-Grip Pull-Ups",
+    "musculo": "espalda",
+    "secundarios": [
+      "biceps",
+      "hombros"
+    ]
+  },
+  {
+    "id": "dominadas-asistidas-maquina",
+    "nombre": "Dominadas Asistidas en Máquina",
+    "en": "Assisted Pull-Ups",
+    "musculo": "espalda",
+    "secundarios": [
+      "biceps",
+      "hombros"
+    ]
+  },
+  {
+    "id": "peso-muerto-convencional",
+    "nombre": "Peso Muerto Convencional",
+    "en": "Barbell Deadlift",
+    "musculo": "espalda",
+    "secundarios": [
+      "isquios",
+      "core"
+    ]
+  },
+  {
+    "id": "peso-muerto-sumo",
+    "nombre": "Peso Muerto Sumo",
+    "en": "Sumo Deadlift",
+    "musculo": "espalda",
+    "secundarios": [
+      "isquios",
+      "core"
+    ]
+  },
+  {
+    "id": "remo-meadows-barra-landmine",
+    "nombre": "Remo Meadows con Barra Landmine",
+    "en": "Meadows Row",
+    "musculo": "espalda",
+    "secundarios": [
+      "biceps",
+      "hombros"
+    ]
+  },
+  {
+    "id": "remo-seal-banco",
+    "nombre": "Remo Seal en Banco",
+    "en": "Seal Row",
+    "musculo": "espalda",
+    "secundarios": [
+      "biceps",
+      "hombros"
+    ]
+  },
+  {
+    "id": "remo-apoyado-banco-inclinado-mancuernas",
+    "nombre": "Remo Apoyado en Banco Inclinado con Mancuernas",
+    "en": "Incline Dumbbell Row",
+    "musculo": "espalda",
+    "secundarios": [
+      "biceps",
+      "hombros"
+    ]
+  },
+  {
+    "id": "remo-polea-pie",
+    "nombre": "Remo en Polea de Pie",
+    "en": "Standing Cable Row",
+    "musculo": "espalda",
+    "secundarios": [
+      "biceps",
+      "hombros"
+    ]
+  },
+  {
+    "id": "pull-over-mancuerna-banco",
+    "nombre": "Pull-Over con Mancuerna en Banco",
+    "en": "Dumbbell Lat Pullover",
+    "musculo": "espalda",
+    "secundarios": [
+      "triceps"
+    ]
+  },
+  {
+    "id": "hiperextensiones-banco-espalda-baja",
+    "nombre": "Hiperextensiones / Banco de Espalda Baja",
+    "en": "Back Extensions",
+    "musculo": "espalda",
+    "secundarios": [
+      "isquios"
+    ]
+  },
+  {
+    "id": "buenos-dias-barra",
+    "nombre": "Buenos Días con Barra",
+    "en": "Good Mornings",
+    "musculo": "espalda",
+    "secundarios": [
+      "isquios"
+    ]
+  },
+  {
+    "id": "encogimientos-hombros-barra",
+    "nombre": "Encogimientos de Hombros con Barra",
+    "en": "Barbell Shrug",
+    "musculo": "espalda",
+    "secundarios": []
+  },
+  {
+    "id": "encogimientos-hombros-mancuernas",
+    "nombre": "Encogimientos de Hombros con Mancuernas",
+    "en": "Dumbbell Shrug",
+    "musculo": "espalda",
+    "secundarios": []
+  },
+  {
+    "id": "encogimientos-polea",
+    "nombre": "Encogimientos en Polea",
+    "en": "Cable Shrug",
+    "musculo": "espalda",
+    "secundarios": []
+  },
+  {
+    "id": "rack-pulls-peso-muerto-desde-soporte",
+    "nombre": "Rack Pulls / Peso Muerto desde Soporte",
+    "en": "Rack Pull",
+    "musculo": "espalda",
+    "secundarios": [
+      "isquios",
+      "core"
+    ]
+  },
+  {
+    "id": "remo-yates",
+    "nombre": "Remo Yates",
+    "en": "Yates Row",
+    "musculo": "espalda",
+    "secundarios": [
+      "biceps",
+      "hombros"
+    ]
+  },
+  {
+    "id": "remo-krok",
+    "nombre": "Remo Krok",
+    "en": "Krok Row",
+    "musculo": "espalda",
+    "secundarios": [
+      "biceps",
+      "hombros"
+    ]
+  },
+  {
+    "id": "jalon-neutro-unilateral-polea-alta",
+    "nombre": "Jalón Neutro Unilateral en Polea Alta",
+    "en": "Single-Arm Neutral Lat Pulldown",
+    "musculo": "espalda",
+    "secundarios": [
+      "biceps",
+      "hombros"
+    ]
+  },
+  {
+    "id": "dominadas-lastre",
+    "nombre": "Dominadas con Lastre",
+    "en": "Weighted Pull-Ups",
+    "musculo": "espalda",
+    "secundarios": [
+      "biceps",
+      "hombros"
+    ]
+  },
+  {
+    "id": "remo-maquina-articulada",
+    "nombre": "Remo en Máquina Articulada",
+    "en": "Chest-Supported Machine Row",
+    "musculo": "espalda",
+    "secundarios": [
+      "biceps",
+      "hombros"
+    ]
+  },
+  {
+    "id": "elevaciones-laterales-mancuernas",
+    "nombre": "Elevaciones Laterales con Mancuernas",
+    "en": "Dumbbell Lateral Raise",
+    "musculo": "hombros",
+    "secundarios": []
+  },
+  {
+    "id": "elevaciones-laterales-polea",
+    "nombre": "Elevaciones Laterales en Polea",
+    "en": "Cable Lateral Raise",
+    "musculo": "hombros",
+    "secundarios": []
+  },
+  {
+    "id": "elevaciones-laterales-unilaterales-polea",
+    "nombre": "Elevaciones Laterales Unilaterales en Polea",
+    "en": "Single-Arm Cable Lateral Raise",
+    "musculo": "hombros",
+    "secundarios": []
+  },
+  {
+    "id": "elevaciones-laterales-maquina",
+    "nombre": "Elevaciones Laterales en Máquina",
+    "en": "Machine Lateral Raise",
+    "musculo": "hombros",
+    "secundarios": []
+  },
+  {
+    "id": "press-militar-barra-pie",
+    "nombre": "Press Militar con Barra de Pie",
+    "en": "Overhead Press / Military Press",
+    "musculo": "hombros",
+    "secundarios": [
+      "triceps"
+    ]
+  },
+  {
+    "id": "press-hombros-sentado-mancuernas",
+    "nombre": "Press de Hombros Sentado con Mancuernas",
+    "en": "Seated Dumbbell Shoulder Press",
+    "musculo": "hombros",
+    "secundarios": [
+      "triceps"
+    ]
+  },
+  {
+    "id": "press-arnold",
+    "nombre": "Press Arnold",
+    "en": "Arnold Press",
+    "musculo": "hombros",
+    "secundarios": [
+      "triceps"
+    ]
+  },
+  {
+    "id": "press-hombros-maquina",
+    "nombre": "Press de Hombros en Máquina",
+    "en": "Machine Shoulder Press",
+    "musculo": "hombros",
+    "secundarios": [
+      "triceps"
+    ]
+  },
+  {
+    "id": "press-militar-multipower-smith",
+    "nombre": "Press Militar en Multipower / Smith",
+    "en": "Smith Machine Shoulder Press",
+    "musculo": "hombros",
+    "secundarios": [
+      "triceps"
+    ]
+  },
+  {
+    "id": "pajaros-deltoides-posterior-mancuernas",
+    "nombre": "Pájaros / Deltoides Posterior con Mancuernas",
+    "en": "Rear Delt Dumbbell Fly",
+    "musculo": "hombros",
+    "secundarios": [
+      "espalda"
+    ]
+  },
+  {
+    "id": "deltoides-posterior-pec-deck",
+    "nombre": "Deltoides Posterior en Pec Deck",
+    "en": "Reverse Pec Deck Fly",
+    "musculo": "hombros",
+    "secundarios": [
+      "espalda"
+    ]
+  },
+  {
+    "id": "face-pulls-polea",
+    "nombre": "Face Pulls en Polea",
+    "en": "Cable Face Pull",
+    "musculo": "hombros",
+    "secundarios": [
+      "espalda"
+    ]
+  },
+  {
+    "id": "elevaciones-frontales-mancuernas",
+    "nombre": "Elevaciones Frontales con Mancuernas",
+    "en": "Dumbbell Front Raise",
+    "musculo": "hombros",
+    "secundarios": []
+  },
+  {
+    "id": "elevaciones-frontales-barra",
+    "nombre": "Elevaciones Frontales con Barra",
+    "en": "Barbell Front Raise",
+    "musculo": "hombros",
+    "secundarios": []
+  },
+  {
+    "id": "elevaciones-frontales-disco",
+    "nombre": "Elevaciones Frontales con Disco",
+    "en": "Plate Front Raise",
+    "musculo": "hombros",
+    "secundarios": []
+  },
+  {
+    "id": "elevaciones-frontales-polea",
+    "nombre": "Elevaciones Frontales en Polea",
+    "en": "Cable Front Raise",
+    "musculo": "hombros",
+    "secundarios": []
+  },
+  {
+    "id": "elevaciones-laterales-inclinadas-banco",
+    "nombre": "Elevaciones Laterales Inclinadas en Banco",
+    "en": "Incline Dumbbell Lateral Raise",
+    "musculo": "hombros",
+    "secundarios": []
+  },
+  {
+    "id": "deltoides-posterior-polea-cruzada",
+    "nombre": "Deltoides Posterior en Polea Cruzada",
+    "en": "Cable Rear Delt Fly",
+    "musculo": "hombros",
+    "secundarios": [
+      "espalda"
+    ]
+  },
+  {
+    "id": "press-push-press",
+    "nombre": "Press Push Press",
+    "en": "Push Press",
+    "musculo": "hombros",
+    "secundarios": [
+      "triceps"
+    ]
+  },
+  {
+    "id": "press-landmine-mano",
+    "nombre": "Press Landmine a Una Mano",
+    "en": "Single-Arm Landmine Press",
+    "musculo": "hombros",
+    "secundarios": [
+      "triceps"
+    ]
+  },
+  {
+    "id": "press-bradford",
+    "nombre": "Press Bradford",
+    "en": "Bradford Press",
+    "musculo": "hombros",
+    "secundarios": [
+      "triceps"
+    ]
+  },
+  {
+    "id": "elevacion-banco-inclinado",
+    "nombre": "Elevación Y en Banco Inclinado",
+    "en": "Y-Raise on Incline Bench",
+    "musculo": "hombros",
+    "secundarios": [
+      "espalda"
+    ]
+  },
+  {
+    "id": "elevaciones-laterales-lu-raise",
+    "nombre": "Elevaciones Laterales Lu Raise",
+    "en": "Lu Raises",
+    "musculo": "hombros",
+    "secundarios": []
+  },
+  {
+    "id": "press-z",
+    "nombre": "Press Z",
+    "en": "Z Press",
+    "musculo": "hombros",
+    "secundarios": [
+      "triceps"
+    ]
+  },
+  {
+    "id": "elevaciones-laterales-recostado-banco",
+    "nombre": "Elevaciones Laterales Recostado en Banco",
+    "en": "Lying Lateral Raise",
+    "musculo": "hombros",
+    "secundarios": []
+  },
+  {
+    "id": "curl-biceps-barra-recta",
+    "nombre": "Curl de Bíceps con Barra Recta",
+    "en": "Barbell Curl",
+    "musculo": "biceps",
+    "secundarios": []
+  },
+  {
+    "id": "curl-biceps-barra-z",
+    "nombre": "Curl de Bíceps con Barra Z",
+    "en": "EZ-Bar Curl",
+    "musculo": "biceps",
+    "secundarios": []
+  },
+  {
+    "id": "curl-biceps-alterno-mancuernas",
+    "nombre": "Curl de Bíceps Alterno con Mancuernas",
+    "en": "Alternating Dumbbell Curl",
+    "musculo": "biceps",
+    "secundarios": []
+  },
+  {
+    "id": "curl-martillo-mancuernas",
+    "nombre": "Curl Martillo con Mancuernas",
+    "en": "Dumbbell Hammer Curl",
+    "musculo": "biceps",
+    "secundarios": []
+  },
+  {
+    "id": "curl-martillo-polea-cuerda",
+    "nombre": "Curl Martillo en Polea con Cuerda",
+    "en": "Cable Rope Hammer Curl",
+    "musculo": "biceps",
+    "secundarios": []
+  },
+  {
+    "id": "curl-predicador-banco-scott-barra-z",
+    "nombre": "Curl Predicador / Banco Scott con Barra Z",
+    "en": "EZ-Bar Preacher Curl",
+    "musculo": "biceps",
+    "secundarios": []
+  },
+  {
+    "id": "curl-predicador-unilateral-mancuerna",
+    "nombre": "Curl Predicador Unilateral con Mancuerna",
+    "en": "Single-Arm Dumbbell Preacher Curl",
+    "musculo": "biceps",
+    "secundarios": []
+  },
+  {
+    "id": "curl-bayesiano-polea",
+    "nombre": "Curl Bayesiano en Polea",
+    "en": "Bayesian Cable Curl",
+    "musculo": "biceps",
+    "secundarios": []
+  },
+  {
+    "id": "curl-inclinado-mancuernas",
+    "nombre": "Curl Inclinado con Mancuernas",
+    "en": "Incline Dumbbell Curl",
+    "musculo": "biceps",
+    "secundarios": []
+  },
+  {
+    "id": "curl-concentrado-mancuerna",
+    "nombre": "Curl Concentrado con Mancuerna",
+    "en": "Concentration Curl",
+    "musculo": "biceps",
+    "secundarios": []
+  },
+  {
+    "id": "curl-biceps-polea-baja",
+    "nombre": "Curl de Bíceps en Polea Baja",
+    "en": "Cable Biceps Curl",
+    "musculo": "biceps",
+    "secundarios": []
+  },
+  {
+    "id": "curl-arana-banco-inclinado",
+    "nombre": "Curl Araña en Banco Inclinado",
+    "en": "Spider Curl",
+    "musculo": "biceps",
+    "secundarios": []
+  },
+  {
+    "id": "curl-hercules-polea-alta",
+    "nombre": "Curl Hércules en Polea Alta",
+    "en": "High Cable Curl",
+    "musculo": "biceps",
+    "secundarios": []
+  },
+  {
+    "id": "curl-invertido-barra-z",
+    "nombre": "Curl Invertido con Barra Z",
+    "en": "Reverse EZ-Bar Curl",
+    "musculo": "biceps",
+    "secundarios": []
+  },
+  {
+    "id": "curl-zottman",
+    "nombre": "Curl Zottman",
+    "en": "Zottman Curl",
+    "musculo": "biceps",
+    "secundarios": []
+  },
+  {
+    "id": "curl-muneca-antebrazo",
+    "nombre": "Curl de Muñeca para Antebrazo",
+    "en": "Wrist Curl",
+    "musculo": "biceps",
+    "secundarios": []
+  },
+  {
+    "id": "curl-invertido-muneca",
+    "nombre": "Curl Invertido de Muñeca",
+    "en": "Reverse Wrist Curl",
+    "musculo": "biceps",
+    "secundarios": []
+  },
+  {
+    "id": "paseo-granjero",
+    "nombre": "Paseo del Granjero",
+    "en": "Farmer's Walk",
+    "musculo": "biceps",
+    "secundarios": [
+      "core"
+    ]
+  },
+  {
+    "id": "curl-martillo-cruzado-pinwheel",
+    "nombre": "Curl Martillo Cruzado / Pinwheel",
+    "en": "Pinwheel Curl",
+    "musculo": "biceps",
+    "secundarios": []
+  },
+  {
+    "id": "curl-biceps-maquina",
+    "nombre": "Curl de Bíceps en Máquina",
+    "en": "Machine Biceps Curl",
+    "musculo": "biceps",
+    "secundarios": []
+  },
+  {
+    "id": "extension-triceps-polea-cuerda",
+    "nombre": "Extensión de Tríceps en Polea con Cuerda",
+    "en": "Rope Triceps Pushdown",
+    "musculo": "triceps",
+    "secundarios": []
+  },
+  {
+    "id": "extension-triceps-polea-barra-recta-v",
+    "nombre": "Extensión de Tríceps en Polea con Barra Recta / V",
+    "en": "Bar Pushdown",
+    "musculo": "triceps",
+    "secundarios": []
+  },
+  {
+    "id": "extension-katana-triceps-polea",
+    "nombre": "Extensión Katana para Tríceps en Polea",
+    "en": "Katana Triceps Extension",
+    "musculo": "triceps",
+    "secundarios": []
+  },
+  {
+    "id": "press-frances-barra-z",
+    "nombre": "Press Francés con Barra Z",
+    "en": "EZ-Bar French Press / Lying Extension",
+    "musculo": "triceps",
+    "secundarios": []
+  },
+  {
+    "id": "press-frances-mancuernas",
+    "nombre": "Press Francés con Mancuernas",
+    "en": "Dumbbell Skullcrusher",
+    "musculo": "triceps",
+    "secundarios": []
+  },
+  {
+    "id": "extension-trasnuca-mancuerna-dos-manos",
+    "nombre": "Extensión Trasnuca con Mancuerna a Dos Manos",
+    "en": "Overhead Dumbbell Extension",
+    "musculo": "triceps",
+    "secundarios": []
+  },
+  {
+    "id": "extension-trasnuca-unilateral-mancuerna",
+    "nombre": "Extensión Trasnuca Unilateral con Mancuerna",
+    "en": "Single-Arm Overhead Dumbbell Extension",
+    "musculo": "triceps",
+    "secundarios": []
+  },
+  {
+    "id": "extension-trasnuca-polea-cuerda",
+    "nombre": "Extensión Trasnuca en Polea con Cuerda",
+    "en": "Cable Overhead Extension",
+    "musculo": "triceps",
+    "secundarios": []
+  },
+  {
+    "id": "fondos-entre-bancos",
+    "nombre": "Fondos entre Bancos",
+    "en": "Bench Dips",
+    "musculo": "triceps",
+    "secundarios": [
+      "pecho",
+      "hombros"
+    ]
+  },
+  {
+    "id": "press-banca-agarre-cerrado",
+    "nombre": "Press de Banca Agarre Cerrado",
+    "en": "Close-Grip Bench Press",
+    "musculo": "triceps",
+    "secundarios": [
+      "pecho",
+      "hombros"
+    ]
+  },
+  {
+    "id": "extension-unilateral-triceps-polea",
+    "nombre": "Extensión Unilateral de Tríceps en Polea",
+    "en": "Single-Arm Cable Pushdown",
+    "musculo": "triceps",
+    "secundarios": []
+  },
+  {
+    "id": "patada-triceps-mancuerna",
+    "nombre": "Patada de Tríceps con Mancuerna",
+    "en": "Dumbbell Kickback",
+    "musculo": "triceps",
+    "secundarios": []
+  },
+  {
+    "id": "patada-triceps-polea",
+    "nombre": "Patada de Tríceps en Polea",
+    "en": "Cable Kickback",
+    "musculo": "triceps",
+    "secundarios": []
+  },
+  {
+    "id": "extension-triceps-maquina",
+    "nombre": "Extensión de Tríceps en Máquina",
+    "en": "Machine Triceps Extension",
+    "musculo": "triceps",
+    "secundarios": []
+  },
+  {
+    "id": "press-frances-inclinado",
+    "nombre": "Press Francés Inclinado",
+    "en": "Incline Dumbbell Skullcrusher",
+    "musculo": "triceps",
+    "secundarios": []
+  },
+  {
+    "id": "extension-triceps-jm-press",
+    "nombre": "Extensión de Tríceps JM Press",
+    "en": "JM Press",
+    "musculo": "triceps",
+    "secundarios": [
+      "pecho",
+      "hombros"
+    ]
+  },
+  {
+    "id": "press-agarre-cerrado-multipower",
+    "nombre": "Press Agarre Cerrado en Multipower",
+    "en": "Smith Close-Grip Bench Press",
+    "musculo": "triceps",
+    "secundarios": [
+      "pecho",
+      "hombros"
+    ]
+  },
+  {
+    "id": "extension-unilateral-trasnuca-polea",
+    "nombre": "Extensión Unilateral Trasnuca en Polea",
+    "en": "Single-Arm Cable Overhead Extension",
+    "musculo": "triceps",
+    "secundarios": []
+  },
+  {
+    "id": "fondos-maquina-triceps",
+    "nombre": "Fondos en Máquina para Tríceps",
+    "en": "Machine Triceps Dips",
+    "musculo": "triceps",
+    "secundarios": [
+      "pecho"
+    ]
+  },
+  {
+    "id": "extension-triceps-cabeza-barra-z",
+    "nombre": "Extensión de Tríceps sobre la Cabeza con Barra Z",
+    "en": "Overhead EZ-Bar Triceps Extension",
+    "musculo": "triceps",
+    "secundarios": []
+  },
+  {
+    "id": "sentadilla-libre-barra",
+    "nombre": "Sentadilla Libre con Barra",
+    "en": "Barbell Back Squat",
+    "musculo": "cuadriceps",
+    "secundarios": [
+      "isquios",
+      "core"
+    ]
+  },
+  {
+    "id": "sentadilla-frontal-barra",
+    "nombre": "Sentadilla Frontal con Barra",
+    "en": "Barbell Front Squat",
+    "musculo": "cuadriceps",
+    "secundarios": [
+      "isquios",
+      "core"
+    ]
+  },
+  {
+    "id": "sentadilla-hack",
+    "nombre": "Sentadilla Hack",
+    "en": "Hack Squat",
+    "musculo": "cuadriceps",
+    "secundarios": [
+      "isquios",
+      "core"
+    ]
+  },
+  {
+    "id": "sentadilla-pendular",
+    "nombre": "Sentadilla Pendular",
+    "en": "Pendulum Squat",
+    "musculo": "cuadriceps",
+    "secundarios": [
+      "isquios",
+      "core"
+    ]
+  },
+  {
+    "id": "extension-piernas-maquina",
+    "nombre": "Extensión de Piernas en Máquina",
+    "en": "Leg Extension",
+    "musculo": "cuadriceps",
+    "secundarios": []
+  },
+  {
+    "id": "prensa-piernas-45",
+    "nombre": "Prensa de Piernas 45°",
+    "en": "Leg Press",
+    "musculo": "cuadriceps",
+    "secundarios": [
+      "isquios"
+    ]
+  },
+  {
+    "id": "sentadilla-bulgara-mancuernas",
+    "nombre": "Sentadilla Búlgara con Mancuernas",
+    "en": "Bulgarian Split Squat",
+    "musculo": "cuadriceps",
+    "secundarios": [
+      "isquios",
+      "core"
+    ]
+  },
+  {
+    "id": "sentadilla-goblet-mancuerna-pesa-rusa",
+    "nombre": "Sentadilla Goblet con Mancuerna / Pesa Rusa",
+    "en": "Goblet Squat",
+    "musculo": "cuadriceps",
+    "secundarios": [
+      "isquios",
+      "core"
+    ]
+  },
+  {
+    "id": "sentadilla-smith-multipower",
+    "nombre": "Sentadilla Smith / Multipower",
+    "en": "Smith Machine Squat",
+    "musculo": "cuadriceps",
+    "secundarios": [
+      "isquios",
+      "core"
+    ]
+  },
+  {
+    "id": "zancadas-desplantes-caminando",
+    "nombre": "Zancadas / Desplantes Caminando",
+    "en": "Walking Lunges",
+    "musculo": "cuadriceps",
+    "secundarios": [
+      "isquios",
+      "core"
+    ]
+  },
+  {
+    "id": "zancadas-estaticas-mancuernas",
+    "nombre": "Zancadas Estáticas con Mancuernas",
+    "en": "Dumbbell Lunges",
+    "musculo": "cuadriceps",
+    "secundarios": [
+      "isquios",
+      "core"
+    ]
+  },
+  {
+    "id": "zancadas-hacia-atras",
+    "nombre": "Zancadas Hacia Atrás",
+    "en": "Reverse Lunges",
+    "musculo": "cuadriceps",
+    "secundarios": [
+      "isquios",
+      "core"
+    ]
+  },
+  {
+    "id": "aductores-maquina",
+    "nombre": "Aductores en Máquina",
+    "en": "Hip Adduction Machine",
+    "musculo": "cuadriceps",
+    "secundarios": []
+  },
+  {
+    "id": "abductores-maquina",
+    "nombre": "Abductores en Máquina",
+    "en": "Hip Abduction Machine",
+    "musculo": "cuadriceps",
+    "secundarios": []
+  },
+  {
+    "id": "sentadilla-sissy",
+    "nombre": "Sentadilla Sissy",
+    "en": "Sissy Squat",
+    "musculo": "cuadriceps",
+    "secundarios": []
+  },
+  {
+    "id": "sentadilla-cossack",
+    "nombre": "Sentadilla Cossack",
+    "en": "Cossack Squat",
+    "musculo": "cuadriceps",
+    "secundarios": [
+      "isquios",
+      "core"
+    ]
+  },
+  {
+    "id": "sentadilla-zercher",
+    "nombre": "Sentadilla Zercher",
+    "en": "Zercher Squat",
+    "musculo": "cuadriceps",
+    "secundarios": [
+      "isquios",
+      "core"
+    ]
+  },
+  {
+    "id": "subidas-banco-mancuernas",
+    "nombre": "Subidas al Banco con Mancuernas",
+    "en": "Dumbbell Step-Ups",
+    "musculo": "cuadriceps",
+    "secundarios": [
+      "isquios",
+      "core"
+    ]
+  },
+  {
+    "id": "prensa-horizontal-maquina",
+    "nombre": "Prensa Horizontal en Máquina",
+    "en": "Seated Leg Press",
+    "musculo": "cuadriceps",
+    "secundarios": [
+      "isquios"
+    ]
+  },
+  {
+    "id": "zancadas-deficitarias",
+    "nombre": "Zancadas Deficitarias",
+    "en": "Deficit Lunges",
+    "musculo": "cuadriceps",
+    "secundarios": [
+      "isquios",
+      "core"
+    ]
+  },
+  {
+    "id": "sentadilla-bulgara-multipower",
+    "nombre": "Sentadilla Búlgara en Multipower",
+    "en": "Smith Machine Bulgarian Split Squat",
+    "musculo": "cuadriceps",
+    "secundarios": [
+      "isquios",
+      "core"
+    ]
+  },
+  {
+    "id": "sentadilla-caja-box-squat",
+    "nombre": "Sentadilla de Caja / Box Squat",
+    "en": "Box Squat",
+    "musculo": "cuadriceps",
+    "secundarios": [
+      "isquios",
+      "core"
+    ]
+  },
+  {
+    "id": "extension-piernas-unilateral",
+    "nombre": "Extensión de Piernas Unilateral",
+    "en": "Single-Leg Extension",
+    "musculo": "cuadriceps",
+    "secundarios": []
+  },
+  {
+    "id": "sentadilla-split-barra",
+    "nombre": "Sentadilla Split con Barra",
+    "en": "Barbell Split Squat",
+    "musculo": "cuadriceps",
+    "secundarios": [
+      "isquios",
+      "core"
+    ]
+  },
+  {
+    "id": "prensa-unilateral",
+    "nombre": "Prensa Unilateral",
+    "en": "Single-Leg Press",
+    "musculo": "cuadriceps",
+    "secundarios": [
+      "isquios"
+    ]
+  },
+  {
+    "id": "curl-femoral-tumbado-maquina",
+    "nombre": "Curl Femoral Tumbado en Máquina",
+    "en": "Lying Leg Curl",
+    "musculo": "isquios",
+    "secundarios": [
+      "gemelos"
+    ]
+  },
+  {
+    "id": "curl-femoral-sentado-maquina",
+    "nombre": "Curl Femoral Sentado en Máquina",
+    "en": "Seated Leg Curl",
+    "musculo": "isquios",
+    "secundarios": [
+      "gemelos"
+    ]
+  },
+  {
+    "id": "curl-femoral-pie-unilateral",
+    "nombre": "Curl Femoral De Pie Unilateral",
+    "en": "Standing Single-Leg Curl",
+    "musculo": "isquios",
+    "secundarios": [
+      "gemelos"
+    ]
+  },
+  {
+    "id": "peso-muerto-rumano-barra",
+    "nombre": "Peso Muerto Rumano con Barra",
+    "en": "Barbell Romanian Deadlift - RDL",
+    "musculo": "isquios",
+    "secundarios": [
+      "espalda",
+      "core"
+    ]
+  },
+  {
+    "id": "peso-muerto-rumano-mancuernas",
+    "nombre": "Peso Muerto Rumano con Mancuernas",
+    "en": "Dumbbell Romanian Deadlift",
+    "musculo": "isquios",
+    "secundarios": [
+      "espalda",
+      "core"
+    ]
+  },
+  {
+    "id": "peso-muerto-piernas-rigidas",
+    "nombre": "Peso Muerto Piernas Rígidas",
+    "en": "Stiff-Leg Deadlift",
+    "musculo": "isquios",
+    "secundarios": [
+      "espalda",
+      "core"
+    ]
+  },
+  {
+    "id": "hip-thrust-empuje-cadera-barra",
+    "nombre": "Hip Thrust / Empuje de Cadera con Barra",
+    "en": "Barbell Hip Thrust",
+    "musculo": "isquios",
+    "secundarios": [
+      "core"
+    ]
+  },
+  {
+    "id": "hip-thrust-maquina",
+    "nombre": "Hip Thrust en Máquina",
+    "en": "Machine Hip Thrust",
+    "musculo": "isquios",
+    "secundarios": [
+      "core"
+    ]
+  },
+  {
+    "id": "bridge-gluteo-glute-bridge",
+    "nombre": "Bridge de Glúteo / Glute Bridge",
+    "en": "Glute Bridge",
+    "musculo": "isquios",
+    "secundarios": [
+      "core"
+    ]
+  },
+  {
+    "id": "kickback-gluteo-polea",
+    "nombre": "Kickback de Glúteo en Polea",
+    "en": "Cable Glute Kickback",
+    "musculo": "isquios",
+    "secundarios": []
+  },
+  {
+    "id": "kickback-gluteo-maquina",
+    "nombre": "Kickback de Glúteo en Máquina",
+    "en": "Machine Glute Kickback",
+    "musculo": "isquios",
+    "secundarios": []
+  },
+  {
+    "id": "abduccion-cadera-polea",
+    "nombre": "Abducción de Cadera en Polea",
+    "en": "Cable Hip Abduction",
+    "musculo": "isquios",
+    "secundarios": []
+  },
+  {
+    "id": "curl-nordico-isquiotibiales",
+    "nombre": "Curl Nórdico de Isquiotibiales",
+    "en": "Nordic Hamstring Curl",
+    "musculo": "isquios",
+    "secundarios": [
+      "gemelos"
+    ]
+  },
+  {
+    "id": "peso-muerto-rumano-unilateral",
+    "nombre": "Peso Muerto Rumano Unilateral",
+    "en": "Single-Leg RDL",
+    "musculo": "isquios",
+    "secundarios": [
+      "espalda",
+      "core"
+    ]
+  },
+  {
+    "id": "hiperextensiones-enfocadas-gluteo-45",
+    "nombre": "Hiperextensiones Enfocadas en Glúteo (45°)",
+    "en": "Glute-Focused Hyperextension",
+    "musculo": "isquios",
+    "secundarios": [
+      "espalda"
+    ]
+  },
+  {
+    "id": "paso-lateral-banda-elastica",
+    "nombre": "Paso Lateral con Banda Elástica",
+    "en": "Band Monster Walk",
+    "musculo": "isquios",
+    "secundarios": []
+  },
+  {
+    "id": "hip-thrust-unilateral-mancuerna",
+    "nombre": "Hip Thrust Unilateral con Mancuerna",
+    "en": "Single-Leg Hip Thrust",
+    "musculo": "isquios",
+    "secundarios": [
+      "core"
+    ]
+  },
+  {
+    "id": "frog-pumps",
+    "nombre": "Frog Pumps",
+    "en": "Frog Pumps",
+    "musculo": "isquios",
+    "secundarios": []
+  },
+  {
+    "id": "peso-muerto-rumano-multipower",
+    "nombre": "Peso Muerto Rumano en Multipower",
+    "en": "Smith Machine RDL",
+    "musculo": "isquios",
+    "secundarios": [
+      "espalda",
+      "core"
+    ]
+  },
+  {
+    "id": "curl-femoral-fitball",
+    "nombre": "Curl Femoral con Fitball",
+    "en": "Stability Ball Hamstring Curl",
+    "musculo": "isquios",
+    "secundarios": [
+      "gemelos"
+    ]
+  },
+  {
+    "id": "elevacion-talones-pie-maquina",
+    "nombre": "Elevación de Talones De Pie en Máquina",
+    "en": "Standing Calf Raise",
+    "musculo": "gemelos",
+    "secundarios": []
+  },
+  {
+    "id": "elevacion-talones-sentado",
+    "nombre": "Elevación de Talones Sentado",
+    "en": "Seated Calf Raise",
+    "musculo": "gemelos",
+    "secundarios": []
+  },
+  {
+    "id": "elevacion-talones-prensa",
+    "nombre": "Elevación de Talones en Prensa",
+    "en": "Leg Press Calf Raise",
+    "musculo": "gemelos",
+    "secundarios": []
+  },
+  {
+    "id": "elevacion-talones-multipower-smith",
+    "nombre": "Elevación de Talones en Multipower / Smith",
+    "en": "Smith Machine Calf Raise",
+    "musculo": "gemelos",
+    "secundarios": []
+  },
+  {
+    "id": "elevacion-talon-unilateral-mancuerna",
+    "nombre": "Elevación de Talón Unilateral con Mancuerna",
+    "en": "Single-Leg Dumbbell Calf Raise",
+    "musculo": "gemelos",
+    "secundarios": []
+  },
+  {
+    "id": "crunch-abdominal-polea-alta",
+    "nombre": "Crunch Abdominal en Polea Alta",
+    "en": "Cable Crunch",
+    "musculo": "core",
+    "secundarios": []
+  },
+  {
+    "id": "elevacion-piernas-colgado",
+    "nombre": "Elevación de Piernas Colgado",
+    "en": "Hanging Leg Raise",
+    "musculo": "core",
+    "secundarios": []
+  },
+  {
+    "id": "elevacion-rodillas-capitan-silla-romana",
+    "nombre": "Elevación de Rodillas en Capitán / Silla Romana",
+    "en": "Captain's Chair Knee Raise",
+    "musculo": "core",
+    "secundarios": []
+  },
+  {
+    "id": "crunch-abdominal-suelo",
+    "nombre": "Crunch Abdominal en Suelo",
+    "en": "Abdominal Crunch",
+    "musculo": "core",
+    "secundarios": []
+  },
+  {
+    "id": "plancha-abdominal-isometrica",
+    "nombre": "Plancha Abdominal Isométrica",
+    "en": "Plank",
+    "musculo": "core",
+    "secundarios": [
+      "hombros"
+    ]
+  },
+  {
+    "id": "plancha-lateral",
+    "nombre": "Plancha Lateral",
+    "en": "Side Plank",
+    "musculo": "core",
+    "secundarios": [
+      "hombros"
+    ]
+  },
+  {
+    "id": "rueda-abdominal-ab-wheel-rollout",
+    "nombre": "Rueda Abdominal / Ab Wheel Rollout",
+    "en": "Ab Wheel Rollout",
+    "musculo": "core",
+    "secundarios": [
+      "espalda",
+      "hombros"
+    ]
+  },
+  {
+    "id": "giros-rusos-russian-twists",
+    "nombre": "Giros Rusos / Russian Twists",
+    "en": "Russian Twist",
+    "musculo": "core",
+    "secundarios": []
+  },
+  {
+    "id": "crunch-inverso-reverse-crunch",
+    "nombre": "Crunch Inverso / Reverse Crunch",
+    "en": "Reverse Crunch",
+    "musculo": "core",
+    "secundarios": []
+  },
+  {
+    "id": "elevacion-piernas-banco-plano",
+    "nombre": "Elevación de Piernas en Banco Plano",
+    "en": "Lying Leg Raise",
+    "musculo": "core",
+    "secundarios": []
+  },
+  {
+    "id": "woodchopper-lenador-polea",
+    "nombre": "Woodchopper / Leñador en Polea",
+    "en": "Cable Woodchopper",
+    "musculo": "core",
+    "secundarios": [
+      "hombros"
+    ]
+  },
+  {
+    "id": "deadbug",
+    "nombre": "Deadbug",
+    "en": "Deadbug",
+    "musculo": "core",
+    "secundarios": []
+  },
+  {
+    "id": "bird-dog",
+    "nombre": "Bird Dog",
+    "en": "Bird Dog",
+    "musculo": "core",
+    "secundarios": []
+  },
+  {
+    "id": "crunch-banco-declinado",
+    "nombre": "Crunch en Banco Declinado",
+    "en": "Decline Bench Crunch",
+    "musculo": "core",
+    "secundarios": []
+  },
+  {
+    "id": "crunch-bicicleta",
+    "nombre": "Crunch de Bicicleta",
+    "en": "Bicycle Crunch",
+    "musculo": "core",
+    "secundarios": []
+  },
+  {
+    "id": "toques-talon",
+    "nombre": "Toques de Talón",
+    "en": "Heel Touches",
+    "musculo": "core",
+    "secundarios": []
+  },
+  {
+    "id": "dragon-flag",
+    "nombre": "Dragon Flag",
+    "en": "Dragon Flag",
+    "musculo": "core",
+    "secundarios": [
+      "espalda"
+    ]
+  },
+  {
+    "id": "vacio-abdominal",
+    "nombre": "Vacío Abdominal",
+    "en": "Stomach Vacuum",
+    "musculo": "core",
+    "secundarios": []
+  },
+  {
+    "id": "paseo-granjero-unilateral-maletin",
+    "nombre": "Paseo del Granjero Unilateral / Maletín",
+    "en": "Suitcase Carry",
+    "musculo": "core",
+    "secundarios": [
+      "biceps"
+    ]
+  },
+  {
+    "id": "crunch-maquina",
+    "nombre": "Crunch en Máquina",
+    "en": "Machine Abdominal Crunch",
+    "musculo": "core",
+    "secundarios": []
+  }
 ]

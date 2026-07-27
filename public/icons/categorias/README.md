@@ -4,5 +4,6 @@ Colocar aquí los íconos PNG (silueta negra sobre fondo transparente) de cada c
 - espalda.png
 - brazos.png
 - piernas.png
+- abdomen.png
 
 Se muestran invertidos (blanco) vía CSS para que se vean sobre el fondo oscuro. Mientras un archivo no exista, la UI muestra un ícono genérico como placeholder.

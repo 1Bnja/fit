@@ -23,7 +23,7 @@ No existe un backend HTTP separado: las paginas leen Supabase desde Server Compo
 - Onboarding obligatorio con peso y estatura.
 - Perfil editable con nombre de usuario unico y avatar.
 - Creacion y eliminacion de rutinas; asignacion semanal de dias.
-- Catalogo de 19 ejercicios en cuatro categorias y ejercicios personalizados.
+- Catalogo de 200 ejercicios en cinco categorias y nueve musculos, con buscador.
 - Registro de multiples series con peso y repeticiones.
 - Historial diario y grafico de progreso por ejercicio.
 - Grupos privados con codigo de invitacion, actividad, comparacion y rutinas compartidas.

@@ -69,7 +69,7 @@ No existen pruebas automatizadas unitarias, de integracion ni end-to-end. El bui
 1. Registrar un usuario con y sin confirmacion de correo habilitada.
 2. Confirmar los redirects de login, onboarding y home.
 3. Editar perfil y subir fotos validas, demasiado grandes y de tipo rechazado.
-4. Crear una rutina, asignar dias y agregar ejercicios predefinidos/custom.
+4. Crear una rutina, asignar dias y agregar ejercicios navegando por categoria y buscando por nombre.
 5. Registrar varias series el mismo dia y revisar lista y grafico.
 6. Eliminar y volver a agregar un ejercicio para comprobar que conserva historial.
 7. Crear dos usuarios y un grupo; unirse por codigo y por enlace.
@@ -98,7 +98,8 @@ Antes de desplegar:
 - Tratar cada Server Action como un endpoint publico: validar entrada, autenticar y autorizar.
 - Conservar RLS al agregar tablas o consultas compartidas.
 - Actualizar `supabase/schema.sql` y esta documentacion cuando cambie el modelo.
-- Actualizar `data/exercises.json`, categorias, iconos y tipos en conjunto.
+- Actualizar `data/exercises.json`, categorias, iconos y tipos en conjunto, y correr `npm run check:catalogo`.
+- No reutilizar un `id` del catalogo para otro ejercicio: el historial de `registros_ejercicio` se ancla a ese texto y se reasignaria en silencio.
 
 ## Deuda tecnica y riesgos conocidos
 
@@ -123,6 +124,8 @@ Antes de desplegar:
 | Nueva ruta protegida | `app/`, `proxy.ts`, navegacion y loading/error states |
 | Nueva mutacion | `app/actions/`, componente consumidor, RLS y revalidacion |
 | Nueva entidad | `supabase/schema.sql`, tipos locales, consultas y documentacion |
-| Nueva categoria | `lib/categorias.ts`, `data/exercises.json`, `CategoriaGrid` e icono PNG |
+| Nuevo ejercicio | `data/exercises.json` (id por slug, musculo y secundarios) |
+| Nuevo musculo | `lib/categorias.ts`, `scripts/check-catalogo.mjs` y `data/exercises.json` |
+| Nueva categoria | `lib/categorias.ts`, `CategoriaGrid` e icono PNG |
 | Cambio de perfil | SQL, trigger de alta, formulario, accion y vistas de grupo |
 | Cambio PWA | `public/manifest.json`, `public/sw.js`, iconos y `app/sw-register.tsx` |
