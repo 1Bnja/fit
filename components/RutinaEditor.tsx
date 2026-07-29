@@ -94,7 +94,8 @@ export default function RutinaEditor({
 
   function toggleDia(dia: number) {
     const next = new Set(dias);
-    next.has(dia) ? next.delete(dia) : next.add(dia);
+    if (next.has(dia)) next.delete(dia);
+    else next.add(dia);
     setDias(next);
     startTransition(async () => {
       await asignarDias(rutinaId, [...next]);
