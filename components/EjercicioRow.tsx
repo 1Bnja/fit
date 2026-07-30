@@ -62,6 +62,7 @@ export default function EjercicioRow({
   const [abierto, setAbierto] = useState(false);
   const [peso, setPeso] = useState("");
   const [reps, setReps] = useState("");
+  const [error, setError] = useState<string | null>(null);
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id,
   });

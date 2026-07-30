@@ -3,8 +3,6 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import type { Categoria } from "@/lib/categorias";
-import { getExercises } from "@/lib/exercises";
 import { exerciseById } from "@/lib/exercises";
 
 export type FormState = { error?: string };
@@ -77,7 +75,6 @@ export async function agregarEjercicios(rutinaId: string, ids: string[]) {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
-  const categoriasEstandar = new Map(getExercises().map((e) => [e.id, e.categoria]));
 
   const { data: existentes } = await supabase
     .from("rutina_ejercicios")
@@ -93,8 +90,8 @@ export async function agregarEjercicios(rutinaId: string, ids: string[]) {
       rutina_id: rutinaId,
       ejercicio_id: e.id,
       ejercicio_nombre: e.nombre,
-      es_custom: e.esCustom,
-      categoria: e.categoria ?? categoriasEstandar.get(e.id),
+      es_custom: false,
+      categoria: e.categoria,
       orden: orden++,
     }))
   );
