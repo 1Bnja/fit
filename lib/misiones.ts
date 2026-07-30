@@ -75,8 +75,15 @@ function ordenarPorRotacion<T extends { ejercicio_id: string }>(items: T[], seed
   );
 }
 
+// Gana el primero, no el último: el relleno del catálogo repite los ejercicios que
+// ya venían de la rutina, y un Map los sobrescribía dejando la copia del catálogo,
+// que va con rutina_id null. Eso desligaba las misiones diarias de la rutina:
+// asegurarMisionesActuales las veía sin cubrir, las invalidaba y las regeneraba en
+// cada carga del home, borrando el progreso recién registrado.
 function sinDuplicados(items: EjercicioMision[]) {
-  return [...new Map(items.map((item) => [item.ejercicio_id, item])).values()];
+  const porId = new Map<string, EjercicioMision>();
+  for (const item of items) if (!porId.has(item.ejercicio_id)) porId.set(item.ejercicio_id, item);
+  return [...porId.values()];
 }
 
 function seleccionarPorRutina(items: EjercicioMision[], limite: number, seed: string) {
