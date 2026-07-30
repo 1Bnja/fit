@@ -68,8 +68,7 @@ El dia se calcula con `new Date().getDay()` durante el render del servidor. Por 
 - Crear una rutina con nombre y abrir inmediatamente su editor.
 - Eliminar una rutina con confirmacion; los hijos se eliminan por cascada.
 - Asignar cualquier combinacion de domingo a sabado.
-- Agregar uno o varios ejercicios del catalogo.
-- Crear un ejercicio personalizado dentro de una categoria.
+- Agregar uno o varios ejercicios del catalogo, navegando por categoria y musculo o buscando por nombre en español o ingles.
 - Quitar ejercicios de una rutina sin borrar su historial de cargas.
 - Mantener el orden de insercion mediante `rutina_ejercicios.orden`.
 
@@ -81,12 +80,14 @@ El dia se calcula con `new Date().getDay()` durante el render del servidor. Por 
 
 **Funcionalidades:**
 
-- 19 ejercicios predefinidos: pecho (3), espalda (4), brazos (8) y piernas (4).
-- Cuatro categorias tipadas en `lib/categorias.ts`.
+- 200 ejercicios clasificados en nueve musculos: pecho (30), espalda (35), hombros (25), biceps y antebrazo (20), triceps (20), cuadriceps y cadera (25), isquiotibiales y gluteos (20), gemelos (5) y core (20).
+- Cinco categorias tipadas en `lib/categorias.ts`, derivadas del musculo y nunca guardadas por ejercicio. Las que agrupan varios musculos (Brazos, Piernas) se muestran como desplegables.
+- Cada ejercicio declara un musculo principal y sus secundarios, restringidos a los mismos nueve. Es la base de los rankeds por grupo muscular.
 - Iconos musculares en `public/icons/categorias/` con fallback a Reicon.
-- Ejercicios personalizados persistidos por usuario.
 
-Los ejercicios predefinidos no son filas de base de datos. Se guardan en cada rutina como identificador y nombre desnormalizados; esto conserva el texto historico aunque cambie el JSON.
+El catalogo no son filas de base de datos: es data de solo lectura versionada en git, con IDs por slug (`press-banca-barra`) para que agregar o sacar un ejercicio no renumere a los demas. Se guarda en cada rutina como identificador y nombre desnormalizados; esto conserva el texto historico aunque cambie el JSON.
+
+`npm run check:catalogo` valida el archivo en CI: musculos validos, IDs unicos y secundarios coherentes. Sin eso, un musculo mal escrito no rompe nada visible y el ejercicio desaparece en silencio de su desplegable y de los rankeds.
 
 ## Registro de entrenamiento
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Dumbbell, Dumbbell3, Dumbbell2, Run } from "reicon-react";
+import { Dumbbell, Dumbbell3, Dumbbell2, Run, BodyShape } from "reicon-react";
 import { CATEGORIAS, CATEGORIA_LABEL, type Categoria } from "@/lib/categorias";
 
 const FALLBACK_ICON: Record<Categoria, typeof Dumbbell> = {
@@ -9,6 +9,7 @@ const FALLBACK_ICON: Record<Categoria, typeof Dumbbell> = {
   espalda: Dumbbell2,
   brazos: Dumbbell3,
   piernas: Run,
+  abdomen: BodyShape,
 };
 
 function CategoriaIcon({ categoria }: { categoria: Categoria }) {
