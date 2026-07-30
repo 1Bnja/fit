@@ -85,16 +85,19 @@ export async function agregarEjercicios(rutinaId: string, ids: string[]) {
 
   let orden = (existentes?.[0]?.orden ?? -1) + 1;
 
-  await supabase.from("rutina_ejercicios").insert(
+  const { error } = await supabase.from("rutina_ejercicios").insert(
     ejercicios.map((e) => ({
       rutina_id: rutinaId,
       ejercicio_id: e.id,
       ejercicio_nombre: e.nombre,
-      es_custom: false,
       categoria: e.categoria,
       orden: orden++,
     }))
   );
+
+  // Sin esto el insert falla en silencio y la UI se ve igual que si no hubieras
+  // apretado nada: así se pasó una columna que ya no existía.
+  if (error) console.error("agregarEjercicios:", error);
 
   await invalidarMisionesActuales(supabase);
   revalidatePath(`/rutinas/${rutinaId}`);

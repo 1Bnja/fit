@@ -296,11 +296,6 @@ set categoria = case ejercicio_id
 end
 where categoria is null;
 
-update rutina_ejercicios re
-set categoria = ec.categoria
-from ejercicios_custom ec
-where re.es_custom = true and re.ejercicio_id = ec.id::text and re.categoria is null;
-
 do $$
 begin
   if not exists (
