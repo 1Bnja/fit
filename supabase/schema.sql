@@ -19,20 +19,16 @@ create table if not exists rutinas (
   created_at timestamptz default now()
 );
 
-create table if not exists ejercicios_custom (
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid references profiles(id) on delete cascade,
-  nombre text not null,
-  categoria text not null,
-  created_at timestamptz default now()
-);
-
+-- ejercicio_id referencia el catálogo estático de data/exercises.json, no una
+-- tabla: es data de solo lectura, versionada en git. ejercicio_nombre va copiado
+-- a propósito, para que la rutina siga legible si el ejercicio se saca del
+-- catálogo. No existen ejercicios creados por el usuario: uno inventado no es
+-- comparable con nadie y no podría entrar a los rankeds.
 create table if not exists rutina_ejercicios (
   id uuid primary key default gen_random_uuid(),
   rutina_id uuid references rutinas(id) on delete cascade,
   ejercicio_id text not null,
   ejercicio_nombre text not null,
-  es_custom boolean default false,
   orden int default 0
 );
 
@@ -46,11 +42,15 @@ create table if not exists rutina_dias (
 -- Historial de peso levantado por ejercicio, para trackear progreso.
 -- Se ancla al ejercicio (ejercicio_id/nombre), no a la fila de rutina_ejercicios,
 -- para que el progreso sobreviva si el ejercicio se quita de una rutina.
+-- musculo se congela al insertar desde el catálogo (no se resuelve al leer):
+-- es lo que deja agrupar por músculo en SQL, ya que el catálogo es un JSON que
+-- Postgres no puede joinear. Null = ejercicio fuera del catálogo, se excluye.
 create table if not exists registros_ejercicio (
   id uuid primary key default gen_random_uuid(),
   user_id uuid references profiles(id) on delete cascade,
   ejercicio_id text not null,
   ejercicio_nombre text not null,
+  musculo text,
   peso_kg numeric not null,
   reps int,
   created_at timestamptz default now()
@@ -58,6 +58,9 @@ create table if not exists registros_ejercicio (
 
 create index if not exists registros_ejercicio_user_ejercicio_idx
   on registros_ejercicio (user_id, ejercicio_id, created_at desc);
+
+create index if not exists registros_ejercicio_musculo_idx
+  on registros_ejercicio (musculo, user_id);
 
 -- Grupos de entrenamiento: unirse por código de invitación, ver actividad,
 -- progreso y rutinas de los demás miembros.
@@ -79,7 +82,6 @@ create table if not exists grupo_miembros (
 
 alter table profiles enable row level security;
 alter table rutinas enable row level security;
-alter table ejercicios_custom enable row level security;
 alter table rutina_ejercicios enable row level security;
 alter table rutina_dias enable row level security;
 alter table registros_ejercicio enable row level security;
@@ -91,9 +93,6 @@ create policy "profiles_update_own" on profiles for update using (auth.uid() = i
 create policy "profiles_insert_own" on profiles for insert with check (auth.uid() = id);
 
 create policy "rutinas_all_own" on rutinas for all
-  using (auth.uid() = user_id) with check (auth.uid() = user_id);
-
-create policy "ejercicios_custom_all_own" on ejercicios_custom for all
   using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
 create policy "rutina_ejercicios_all_own" on rutina_ejercicios for all

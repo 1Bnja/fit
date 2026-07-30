@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { exerciseById } from "@/lib/exercises";
 
 async function registrarSerie({
   rutinaId,
@@ -36,6 +37,20 @@ async function registrarSerie({
     p_reps: reps,
     p_rutina_id: rutinaId ?? null,
     p_usuario_mision_id: misionId ?? null,
+   });
+  // El músculo se congela en el registro en vez de resolverse al leer: es lo que
+  // deja rankear en SQL (el catálogo es un JSON, Postgres no lo puede joinear) y
+  // hace que reclasificar un ejercicio no reescriba el historial ya cargado.
+  // Queda null si el id no está en el catálogo (filas viejas), y esas se excluyen.
+  const musculo = exerciseById(ejercicioId)?.musculo ?? null;
+
+  await supabase.from("registros_ejercicio").insert({
+    user_id: user!.id,
+    ejercicio_id: ejercicioId,
+    ejercicio_nombre: ejercicioNombre,
+    musculo,
+    peso_kg: pesoKg,
+    reps,
   });
   if (error) return { error: "No se pudo guardar la serie. Intenta otra vez." };
 

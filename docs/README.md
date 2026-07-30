@@ -25,7 +25,7 @@ No existe un backend HTTP separado: las paginas leen Supabase desde Server Compo
 - Mascotas con progreso equilibrado, ocho fases y recursos reemplazables.
 - Perfil editable con nombre de usuario unico y avatar.
 - Creacion y eliminacion de rutinas; asignacion semanal de dias.
-- Catalogo de 19 ejercicios en cuatro categorias y ejercicios personalizados.
+- Catalogo de 200 ejercicios en cinco categorias y nueve musculos, con buscador.
 - Registro de multiples series con peso y repeticiones.
 - Historial diario y grafico de progreso por ejercicio.
 - Grupos privados con codigo de invitacion, actividad, comparacion y rutinas compartidas.
@@ -52,3 +52,10 @@ proxy.ts               Sesion, proteccion de rutas y gate de onboarding
 - Convenciones del framework: `node_modules/next/dist/docs/`, obligatorio antes de cambiar codigo Next.js en este repositorio.
 
 Cuando la documentacion y el codigo difieran, el codigo y el esquema desplegado son la fuente de verdad. El archivo SQL representa el esquema esperado, pero el repositorio no contiene un historial de migraciones que pruebe el estado exacto de una instancia remota.
+# Documentación del proyecto
+
+Este directorio centraliza la documentación técnica y de producto de Fit.
+
+## Interfaz
+
+- [Login y registro](./AUTH-FRONTEND.md): rediseño visual, comportamiento responsive, estados e integración con autenticación.
