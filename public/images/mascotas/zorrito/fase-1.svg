@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title">
+  <title id="title">Zorrito en su fase inicial</title>
+  <g stroke="#15131f" stroke-linecap="round" stroke-linejoin="round" stroke-width="14">
+    <path fill="#d97706" d="M356 343c61-10 102-57 84-104-13-34-55-42-82-19 24 15 31 42 14 62-18 22-53 19-75 4l-20 43c21 15 49 20 79 14Z"/>
+    <path fill="#f59e0b" d="M151 236c0-76 47-126 105-126s105 50 105 126v78c0 57-42 100-105 100s-105-43-105-100v-78Z"/>
+    <path fill="#f59e0b" d="m166 167-17-105 82 63m115 42 17-105-82 63"/>
+    <path fill="#7c2d12" d="m166 167-8-50 40 31m148 19 8-50-40 31"/>
+    <path fill="#fff7ed" d="M194 247c18-15 42-17 62-4 20-13 44-11 62 4 6 51-11 100-62 115-51-15-68-64-62-115Z"/>
+    <circle cx="219" cy="244" r="9" fill="#15131f" stroke="none"/>
+    <circle cx="293" cy="244" r="9" fill="#15131f" stroke="none"/>
+    <path fill="#15131f" d="m256 274-18 15 18 15 18-15-18-15Z"/>
+    <path fill="none" d="M256 303c-3 15-15 23-29 24m29-24c3 15 15 23 29 24"/>
+    <path fill="#7c2d12" d="M174 369c0-23 18-40 40-40h84c22 0 40 17 40 40v36c0 20-16 36-36 36H210c-20 0-36-16-36-36v-36Z"/>
+    <path fill="#15131f" d="M182 420h51v31h-42c-12 0-18-15-9-31Zm97 0h51c9 16 3 31-9 31h-42v-31Z"/>
+  </g>
+</svg>

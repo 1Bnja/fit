@@ -8,7 +8,6 @@ const nextConfig: NextConfig = {
         hostname: "szpwfypchalpawvyworj.supabase.co",
         port: "",
         pathname: "/storage/v1/object/public/mascotas/**",
-        search: "",
       },
     ],
   },

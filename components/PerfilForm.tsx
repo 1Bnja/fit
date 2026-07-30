@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState, useState } from "react";
 import { User, AtSign, Scale, Ruler, Camera, Dumbbell } from "reicon-react";
 import Field from "@/components/Field";
@@ -112,6 +113,13 @@ export default function PerfilForm({ perfil, email }: { perfil: Perfil; email: s
       >
         {pending ? "Guardando..." : "Guardar cambios"}
       </button>
+
+      <Link
+        href="/mascotas"
+        className="rounded-xl border border-border px-4 py-2.5 text-center text-sm font-medium text-muted hover:border-accent hover:text-foreground"
+      >
+        Cambiar mascota
+      </Link>
     </form>
   );
 }

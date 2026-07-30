@@ -1,5 +1,9 @@
 import { createClient } from "@/lib/supabase/server";
-import { mascotaEstaInactiva, obtenerEvolucionMascota } from "@/lib/mascota.mjs";
+import {
+  mascotaEstaInactiva,
+  obtenerEvolucionMascota,
+  obtenerImagenFaseDisponible,
+} from "@/lib/mascota.mjs";
 import {
   asegurarMisionesActuales,
   periodosActuales,
@@ -10,6 +14,7 @@ import {
 import Mascota from "@/components/mascota/Mascota";
 import { Scale, Ruler, Flame, ChevronRight, Dumbbell } from "reicon-react";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 export default async function HomePage() {
   const supabase = await createClient();
@@ -48,7 +53,8 @@ export default async function HomePage() {
             nombre,
             xp_requerida,
             stat_minima_requerida,
-            imagen_url
+            imagen_url,
+            updated_at
           )
         )
       `)
@@ -60,8 +66,11 @@ export default async function HomePage() {
   const mascota = Array.isArray(mascotaUsuario?.mascotas)
     ? mascotaUsuario.mascotas[0]
     : mascotaUsuario?.mascotas;
+  if (!mascotaUsuario || !mascota) {
+    redirect("/mascotas");
+  }
+
   const fasesMascota = mascota?.mascota_fases ?? [];
-  const imagenInicial = [...fasesMascota].sort((a, b) => a.numero - b.numero)[0]?.imagen_url ?? null;
   const stats = {
     piernas: mascotaUsuario?.piernas ?? 0,
     brazos: mascotaUsuario?.brazos ?? 0,
@@ -87,6 +96,7 @@ export default async function HomePage() {
     xp,
     stats
   );
+  const imagenMascota = obtenerImagenFaseDisponible(fasesMascota, faseActual?.numero);
   const mostrarTumba =
     mascotaUsuario?.estado === "tumba" ||
     mascotaEstaInactiva(profile?.last_active_at ?? profile?.created_at);
@@ -108,10 +118,10 @@ export default async function HomePage() {
       </div>
 
       <Mascota
-        clave={mascota?.clave ?? "ovejita"}
-        nombre={mascota?.nombre ?? "Ovejita"}
+        clave={mascota.clave}
+        nombre={mascota.nombre}
         fase={faseActual?.nombre ?? "Fase inicial"}
-        imagenUrl={faseActual?.imagen_url ?? imagenInicial}
+        imagenUrl={imagenMascota}
         inactiva={mostrarTumba}
         progreso={progreso}
         stats={stats}

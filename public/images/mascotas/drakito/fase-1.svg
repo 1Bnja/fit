@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title">
+  <title id="title">Drakito en su fase inicial</title>
+  <g stroke="#15131f" stroke-linecap="round" stroke-linejoin="round" stroke-width="14">
+    <path fill="#a78bfa" d="M175 209c-49-67-108-64-133-25 44 4 71 35 75 80l67-4m153-51c49-67 108-64 133-25-44 4-71 35-75 80l-67-4"/>
+    <path fill="#ef476f" d="M151 224c0-76 46-128 105-128s105 52 105 128v91c0 64-42 108-105 108s-105-44-105-108v-91Z"/>
+    <path fill="#fbbf24" d="m181 146-9-89 58 58m101 31 9-89-58 58"/>
+    <path fill="#fda4af" d="M183 286c30 17 54 12 73-2 19 14 43 19 73 2-4 67-28 105-73 105s-69-38-73-105Z"/>
+    <circle cx="212" cy="239" r="12" fill="#15131f" stroke="none"/>
+    <circle cx="300" cy="239" r="12" fill="#15131f" stroke="none"/>
+    <path fill="#fff" d="m219 313 17 32 20-28 20 28 17-32"/>
+    <path fill="none" d="M224 278c20 12 44 12 64 0"/>
+    <path fill="#ef476f" d="M179 391c-20 13-30 37-23 59h65l13-44m99-15c20 13 30 37 23 59h-65l-13-44"/>
+    <path fill="#fbbf24" d="m256 102-24-58h48l-24 58Zm0 321-22 45h44l-22-45Z"/>
+    <path fill="#ef476f" d="M343 352c53 6 90 36 93 75-38-21-78-12-105 24l-28-40c5-25 18-45 40-59Z"/>
+  </g>
+</svg>

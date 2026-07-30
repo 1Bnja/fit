@@ -1,4 +1,4 @@
-const CACHE = "fit-static-v2";
+const CACHE = "fit-static-v3";
 const CACHEABLE_DESTINATIONS = new Set(["font", "image", "script", "style"]);
 
 self.addEventListener("install", (event) => {

@@ -336,30 +336,89 @@ $$;
 
 create table if not exists mascotas (
   id uuid primary key default gen_random_uuid(),
-  clave text not null unique,
+  clave text not null unique check (clave ~ '^[a-z0-9][a-z0-9_-]{0,49}$'),
   nombre text not null,
+  descripcion text not null default '',
+  orden smallint not null default 0,
+  disponible boolean not null default false,
   created_at timestamptz not null default now()
 );
 
 create table if not exists mascota_fases (
   id uuid primary key default gen_random_uuid(),
   mascota_id uuid not null references mascotas(id) on delete cascade,
-  numero int not null,
+  numero int not null check (numero between 1 and 8),
   nombre text not null,
   xp_requerida int not null default 0 check (xp_requerida >= 0),
   stat_minima_requerida int not null default 0 check (stat_minima_requerida >= 0),
   imagen_url text,
+  updated_at timestamptz not null default now(),
   unique (mascota_id, numero)
 );
 
+alter table mascotas add column if not exists descripcion text not null default '';
+alter table mascotas add column if not exists orden smallint not null default 0;
+alter table mascotas add column if not exists disponible boolean not null default false;
 alter table mascota_fases add column if not exists stat_minima_requerida int not null default 0;
+alter table mascota_fases add column if not exists updated_at timestamptz not null default now();
 alter table mascota_fases alter column imagen_url drop not null;
+
+do $$
+begin
+  if not exists (
+    select 1 from pg_constraint
+    where conname = 'mascotas_orden_check'
+      and conrelid = 'public.mascotas'::regclass
+  ) then
+    alter table mascotas
+      add constraint mascotas_orden_check check (orden >= 0);
+  end if;
+
+  if not exists (
+    select 1 from pg_constraint
+    where conname = 'mascotas_clave_check'
+      and conrelid = 'public.mascotas'::regclass
+  ) then
+    alter table mascotas
+      add constraint mascotas_clave_check
+      check (clave ~ '^[a-z0-9][a-z0-9_-]{0,49}$');
+  end if;
+
+  if not exists (
+    select 1 from pg_constraint
+    where conname = 'mascota_fases_numero_check'
+      and conrelid = 'public.mascota_fases'::regclass
+  ) then
+    alter table mascota_fases
+      add constraint mascota_fases_numero_check check (numero between 1 and 8);
+  end if;
+
+  if not exists (
+    select 1 from pg_constraint
+    where conname = 'mascota_fases_xp_requerida_check'
+      and conrelid = 'public.mascota_fases'::regclass
+  ) then
+    alter table mascota_fases
+      add constraint mascota_fases_xp_requerida_check check (xp_requerida >= 0);
+  end if;
+
+  if not exists (
+    select 1 from pg_constraint
+    where conname = 'mascota_fases_stat_minima_requerida_check'
+      and conrelid = 'public.mascota_fases'::regclass
+  ) then
+    alter table mascota_fases
+      add constraint mascota_fases_stat_minima_requerida_check
+      check (stat_minima_requerida >= 0);
+  end if;
+end;
+$$;
 
 create table if not exists usuario_mascotas (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references profiles(id) on delete cascade,
   mascota_id uuid not null references mascotas(id) on delete cascade,
-  seleccionada boolean not null default true,
+  seleccionada boolean not null default false,
   estado text not null default 'activa' check (estado in ('activa', 'tumba')),
   xp int not null default 0 check (xp >= 0),
   piernas int not null default 0 check (piernas >= 0),
@@ -370,62 +429,266 @@ create table if not exists usuario_mascotas (
   unique (user_id, mascota_id)
 );
 
+alter table usuario_mascotas alter column seleccionada set default false;
+
 create unique index if not exists usuario_mascotas_una_seleccionada_idx
   on usuario_mascotas (user_id) where seleccionada;
 
-insert into mascotas (clave, nombre)
-values ('ovejita', 'Ovejita')
-on conflict (clave) do nothing;
+create index if not exists mascotas_disponibles_orden_idx
+  on mascotas (disponible, orden, nombre);
 
-insert into mascota_fases (mascota_id, numero, nombre, xp_requerida, stat_minima_requerida, imagen_url)
-select id, 1, 'Fase inicial', 0, 0,
-  'https://szpwfypchalpawvyworj.supabase.co/storage/v1/object/public/mascotas/ovejita/fase-1.png'
-from mascotas where clave = 'ovejita'
-on conflict (mascota_id, numero) do update set
-  nombre = excluded.nombre,
-  xp_requerida = excluded.xp_requerida,
-  stat_minima_requerida = excluded.stat_minima_requerida,
-  imagen_url = excluded.imagen_url;
+create or replace function public.plantilla_fases_mascota()
+returns table (
+  numero int,
+  nombre text,
+  xp_requerida int,
+  stat_minima_requerida int
+)
+language sql
+immutable
+set search_path = public
+as $$
+  values
+    (1, 'Fase inicial', 0, 0),
+    (2, 'Fase 2', 70, 6),
+    (3, 'Fase 3', 220, 20),
+    (4, 'Fase 4', 500, 45),
+    (5, 'Fase 5', 900, 75),
+    (6, 'Fase 6', 1400, 110),
+    (7, 'Fase 7', 2000, 150),
+    (8, 'Fase 8', 2700, 200);
+$$;
 
-insert into mascota_fases (mascota_id, numero, nombre, xp_requerida, stat_minima_requerida)
-select id, fase.numero, fase.nombre, fase.xp, fase.min_stat
-from mascotas
-cross join (values
-  (2, 'Fase 2', 70, 6),
-  (3, 'Fase 3', 220, 20),
-  (4, 'Fase 4', 500, 45)
-) as fase(numero, nombre, xp, min_stat)
-where clave = 'ovejita'
-on conflict (mascota_id, numero) do update set
-  nombre = excluded.nombre,
-  xp_requerida = excluded.xp_requerida,
-  stat_minima_requerida = excluded.stat_minima_requerida;
+revoke all on function public.plantilla_fases_mascota()
+  from public, anon, authenticated;
 
-insert into usuario_mascotas (user_id, mascota_id)
-select p.id, m.id
-from profiles p
-cross join mascotas m
-where m.clave = 'ovejita'
-  and not exists (select 1 from usuario_mascotas um where um.user_id = p.id and um.seleccionada);
-
-create or replace function public.asignar_mascota_inicial()
+create or replace function public.crear_fases_mascota()
 returns trigger
 language plpgsql
 security definer
 set search_path = public
 as $$
 begin
-  insert into usuario_mascotas (user_id, mascota_id)
-  select new.id, id from mascotas where clave = 'ovejita'
-  on conflict (user_id, mascota_id) do nothing;
+  insert into mascota_fases (
+    mascota_id,
+    numero,
+    nombre,
+    xp_requerida,
+    stat_minima_requerida
+  )
+  select
+    new.id,
+    fase.numero,
+    fase.nombre,
+    fase.xp_requerida,
+    fase.stat_minima_requerida
+  from public.plantilla_fases_mascota() as fase
+  on conflict (mascota_id, numero) do nothing;
+
   return new;
 end;
 $$;
 
-drop trigger if exists on_profile_created_mascota on profiles;
-create trigger on_profile_created_mascota
-  after insert on profiles
-  for each row execute function public.asignar_mascota_inicial();
+drop trigger if exists on_mascota_created_fases on mascotas;
+create trigger on_mascota_created_fases
+  after insert on mascotas
+  for each row execute function public.crear_fases_mascota();
+
+create or replace function public.actualizar_mascota_fase_updated_at()
+returns trigger
+language plpgsql
+set search_path = public
+as $$
+begin
+  new.updated_at := now();
+  return new;
+end;
+$$;
+
+drop trigger if exists on_mascota_fase_image_updated on mascota_fases;
+create trigger on_mascota_fase_image_updated
+  before update of imagen_url on mascota_fases
+  for each row
+  when (old.imagen_url is distinct from new.imagen_url)
+  execute function public.actualizar_mascota_fase_updated_at();
+
+insert into mascotas (clave, nombre, descripcion, orden, disponible)
+values
+  ('ovejita', 'Ovejita', 'Constante, equilibrada y siempre lista para avanzar.', 1, true),
+  ('zorrito', 'Zorrito', 'Ágil, curioso y lleno de energía para cada rutina.', 2, true),
+  ('axolito', 'Axolito', 'Paciente, adaptable y experto en volver más fuerte.', 3, true),
+  ('drakito', 'Drakito', 'Pequeño dragón con una determinación enorme.', 4, true)
+on conflict (clave) do update set
+  nombre = excluded.nombre,
+  descripcion = excluded.descripcion,
+  orden = excluded.orden,
+  disponible = excluded.disponible;
+
+insert into mascota_fases as fase_existente (
+  mascota_id,
+  numero,
+  nombre,
+  xp_requerida,
+  stat_minima_requerida,
+  imagen_url
+)
+select
+  m.id,
+  fase.numero,
+  fase.nombre,
+  fase.xp_requerida,
+  fase.stat_minima_requerida,
+  case
+    when fase.numero <> 1 then null
+    when m.clave = 'ovejita' then
+      'https://szpwfypchalpawvyworj.supabase.co/storage/v1/object/public/mascotas/ovejita/fase-1.png'
+    when m.clave = 'zorrito' then '/images/mascotas/zorrito/fase-1.svg'
+    when m.clave = 'axolito' then '/images/mascotas/axolito/fase-1.svg'
+    when m.clave = 'drakito' then '/images/mascotas/drakito/fase-1.svg'
+    else null
+  end
+from mascotas m
+cross join public.plantilla_fases_mascota() as fase
+on conflict (mascota_id, numero) do update set
+  nombre = excluded.nombre,
+  xp_requerida = excluded.xp_requerida,
+  stat_minima_requerida = excluded.stat_minima_requerida,
+  imagen_url = coalesce(fase_existente.imagen_url, excluded.imagen_url);
+
+insert into usuario_mascotas (user_id, mascota_id, seleccionada)
+select p.id, m.id, true
+from profiles p
+cross join mascotas m
+where m.clave = 'ovejita'
+  and coalesce(p.onboarding_completo, false)
+  and not exists (select 1 from usuario_mascotas um where um.user_id = p.id and um.seleccionada)
+on conflict (user_id, mascota_id) do update set seleccionada = true;
+
+do $$
+declare
+  v_trigger record;
+begin
+  for v_trigger in
+    select trg.tgname as nombre
+    from pg_trigger as trg
+    join pg_proc as proc on proc.oid = trg.tgfoid
+    join pg_namespace as proc_schema on proc_schema.oid = proc.pronamespace
+    where trg.tgrelid = 'public.profiles'::regclass
+      and proc_schema.nspname = 'public'
+      and proc.proname = 'asignar_mascota_inicial'
+      and not trg.tgisinternal
+  loop
+    execute format('drop trigger if exists %I on public.profiles', v_trigger.nombre);
+  end loop;
+end;
+$$;
+
+drop function if exists public.asignar_mascota_inicial();
+
+create or replace function public.seleccionar_mascota(p_clave text)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_user_id uuid := auth.uid();
+  v_mascota_id uuid;
+begin
+  if v_user_id is null then
+    raise exception 'no_autenticado';
+  end if;
+
+  perform 1
+  from profiles
+  where id = v_user_id
+  for update;
+
+  if not found then
+    raise exception 'perfil_no_encontrado';
+  end if;
+
+  select id into v_mascota_id
+  from mascotas
+  where clave = p_clave and disponible = true;
+
+  if v_mascota_id is null then
+    raise exception 'mascota_no_disponible';
+  end if;
+
+  update usuario_mascotas
+  set seleccionada = false
+  where user_id = v_user_id and seleccionada = true;
+
+  insert into usuario_mascotas (user_id, mascota_id, seleccionada)
+  values (v_user_id, v_mascota_id, true)
+  on conflict (user_id, mascota_id) do update set seleccionada = true;
+end;
+$$;
+
+revoke all on function public.seleccionar_mascota(text) from public;
+grant execute on function public.seleccionar_mascota(text) to authenticated;
+
+create or replace function public.completar_onboarding_y_elegir_mascota(
+  p_peso_kg numeric,
+  p_estatura_cm numeric,
+  p_clave text
+)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_user_id uuid := auth.uid();
+  v_mascota_id uuid;
+begin
+  if v_user_id is null then
+    raise exception 'no_autenticado';
+  end if;
+
+  if p_peso_kg is null or p_peso_kg < 20 or p_peso_kg > 500
+    or p_estatura_cm is null or p_estatura_cm < 50 or p_estatura_cm > 300 then
+    raise exception 'datos_fisicos_invalidos';
+  end if;
+
+  perform 1
+  from profiles
+  where id = v_user_id
+  for update;
+
+  if not found then
+    raise exception 'perfil_no_encontrado';
+  end if;
+
+  select id into v_mascota_id
+  from mascotas
+  where clave = p_clave and disponible = true;
+
+  if v_mascota_id is null then
+    raise exception 'mascota_no_disponible';
+  end if;
+
+  update usuario_mascotas
+  set seleccionada = false
+  where user_id = v_user_id and seleccionada = true;
+
+  insert into usuario_mascotas (user_id, mascota_id, seleccionada)
+  values (v_user_id, v_mascota_id, true)
+  on conflict (user_id, mascota_id) do update set seleccionada = true;
+
+  update profiles
+  set peso_kg = p_peso_kg,
+      estatura_cm = p_estatura_cm,
+      onboarding_completo = true
+  where id = v_user_id;
+end;
+$$;
+
+revoke all on function public.completar_onboarding_y_elegir_mascota(numeric, numeric, text)
+  from public;
+grant execute on function public.completar_onboarding_y_elegir_mascota(numeric, numeric, text)
+  to authenticated;
 
 create table if not exists usuario_misiones (
   id uuid primary key default gen_random_uuid(),
@@ -550,6 +813,38 @@ create table if not exists usuario_mision_recompensas (
   otorgada_at timestamptz not null default now(),
   primary key (user_id, frecuencia, periodo_inicio, slot)
 );
+
+create or replace function public.validar_mascota_seleccionada_para_recompensa()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  perform 1
+  from profiles
+  where id = new.user_id
+  for update;
+
+  perform 1
+  from usuario_mascotas
+  where user_id = new.user_id and seleccionada = true
+  for update;
+
+  if not found then
+    raise exception 'mascota_no_seleccionada';
+  end if;
+
+  return new;
+end;
+$$;
+
+drop trigger if exists validar_mascota_seleccionada_al_recompensar
+  on usuario_mision_recompensas;
+create trigger validar_mascota_seleccionada_al_recompensar
+  before insert on usuario_mision_recompensas
+  for each row
+  execute function public.validar_mascota_seleccionada_para_recompensa();
 
 insert into usuario_mision_recompensas (user_id, frecuencia, periodo_inicio, slot, otorgada_at)
 select user_id, frecuencia, periodo_inicio, slot, completada_at
@@ -677,6 +972,7 @@ declare
   v_estado progreso_ejercicio_usuario%rowtype;
   v_recompensa_nueva boolean;
   v_actualizadas int := 0;
+  v_mascotas_actualizadas int;
   v_nombre_seguro text := p_ejercicio_nombre;
 begin
   if v_user_id is null then raise exception 'no_autenticado'; end if;
@@ -737,47 +1033,53 @@ begin
       returning true into v_recompensa_nueva;
 
       if v_recompensa_nueva then
-      update usuario_mascotas
-      set xp = xp + v_mision.puntos_evolucion,
-          piernas = piernas + case when v_mision.stat = 'piernas' then v_mision.puntos_stat else 0 end,
-          brazos = brazos + case when v_mision.stat = 'brazos' then v_mision.puntos_stat else 0 end,
-          pecho = pecho + case when v_mision.stat = 'pecho' then v_mision.puntos_stat else 0 end,
-          abdomen = abdomen + case when v_mision.stat = 'abdomen' then v_mision.puntos_stat else 0 end,
-          espalda = espalda + case when v_mision.stat = 'espalda' then v_mision.puntos_stat else 0 end
-      where user_id = v_user_id and seleccionada = true;
-      v_actualizadas := v_actualizadas + 1;
+        update usuario_mascotas
+        set xp = xp + v_mision.puntos_evolucion,
+            piernas = piernas + case when v_mision.stat = 'piernas' then v_mision.puntos_stat else 0 end,
+            brazos = brazos + case when v_mision.stat = 'brazos' then v_mision.puntos_stat else 0 end,
+            pecho = pecho + case when v_mision.stat = 'pecho' then v_mision.puntos_stat else 0 end,
+            abdomen = abdomen + case when v_mision.stat = 'abdomen' then v_mision.puntos_stat else 0 end,
+            espalda = espalda + case when v_mision.stat = 'espalda' then v_mision.puntos_stat else 0 end
+        where user_id = v_user_id and seleccionada = true;
 
-      if v_mision.frecuencia = 'diaria' then
-        select min(peso_kg) into v_peso_minimo from registros_ejercicio
-        where user_id = v_user_id and ejercicio_id = p_ejercicio_id
-          and (created_at at time zone coalesce(v_timezone, 'America/Santiago'))::date = v_hoy
-          and reps >= v_mision.reps_objetivo;
-        select * into v_estado from progreso_ejercicio_usuario
-        where user_id = v_user_id and ejercicio_id = p_ejercicio_id for update;
+        get diagnostics v_mascotas_actualizadas = row_count;
+        if v_mascotas_actualizadas <> 1 then
+          raise exception 'mascota_seleccionada_invalida';
+        end if;
 
-        if not found then
-          insert into progreso_ejercicio_usuario (user_id, ejercicio_id, reps_objetivo, peso_referencia_kg, ultima_exposicion)
-          values (v_user_id, p_ejercicio_id, least(12, v_mision.reps_objetivo + 1), v_peso_minimo, v_hoy);
-        elsif v_estado.ultima_exposicion is distinct from v_hoy then
-          if v_mision.reps_objetivo < 12 then
-            update progreso_ejercicio_usuario
-            set reps_objetivo = v_mision.reps_objetivo + 1, peso_referencia_kg = v_peso_minimo,
-                exitos_en_tope = 0, ultima_exposicion = v_hoy
-            where user_id = v_user_id and ejercicio_id = p_ejercicio_id;
-          elsif v_estado.exitos_en_tope + 1 >= 2 then
-            update progreso_ejercicio_usuario
-            set reps_objetivo = 8,
-                peso_referencia_kg = round(v_peso_minimo * case when v_mision.stat = 'piernas' then 1.05 else 1.025 end, 1),
-                exitos_en_tope = 0, ultima_exposicion = v_hoy
-            where user_id = v_user_id and ejercicio_id = p_ejercicio_id;
-          else
-            update progreso_ejercicio_usuario
-            set reps_objetivo = 12, peso_referencia_kg = v_peso_minimo,
-                exitos_en_tope = exitos_en_tope + 1, ultima_exposicion = v_hoy
-            where user_id = v_user_id and ejercicio_id = p_ejercicio_id;
+        v_actualizadas := v_actualizadas + 1;
+
+        if v_mision.frecuencia = 'diaria' then
+          select min(peso_kg) into v_peso_minimo from registros_ejercicio
+          where user_id = v_user_id and ejercicio_id = p_ejercicio_id
+            and (created_at at time zone coalesce(v_timezone, 'America/Santiago'))::date = v_hoy
+            and reps >= v_mision.reps_objetivo;
+          select * into v_estado from progreso_ejercicio_usuario
+          where user_id = v_user_id and ejercicio_id = p_ejercicio_id for update;
+
+          if not found then
+            insert into progreso_ejercicio_usuario (user_id, ejercicio_id, reps_objetivo, peso_referencia_kg, ultima_exposicion)
+            values (v_user_id, p_ejercicio_id, least(12, v_mision.reps_objetivo + 1), v_peso_minimo, v_hoy);
+          elsif v_estado.ultima_exposicion is distinct from v_hoy then
+            if v_mision.reps_objetivo < 12 then
+              update progreso_ejercicio_usuario
+              set reps_objetivo = v_mision.reps_objetivo + 1, peso_referencia_kg = v_peso_minimo,
+                  exitos_en_tope = 0, ultima_exposicion = v_hoy
+              where user_id = v_user_id and ejercicio_id = p_ejercicio_id;
+            elsif v_estado.exitos_en_tope + 1 >= 2 then
+              update progreso_ejercicio_usuario
+              set reps_objetivo = 8,
+                  peso_referencia_kg = round(v_peso_minimo * case when v_mision.stat = 'piernas' then 1.05 else 1.025 end, 1),
+                  exitos_en_tope = 0, ultima_exposicion = v_hoy
+              where user_id = v_user_id and ejercicio_id = p_ejercicio_id;
+            else
+              update progreso_ejercicio_usuario
+              set reps_objetivo = 12, peso_referencia_kg = v_peso_minimo,
+                  exitos_en_tope = exitos_en_tope + 1, ultima_exposicion = v_hoy
+              where user_id = v_user_id and ejercicio_id = p_ejercicio_id;
+            end if;
           end if;
         end if;
-      end if;
       end if;
     end if;
   end loop;

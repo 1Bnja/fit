@@ -1,7 +1,10 @@
 import Image from "next/image";
+import localFont from "next/font/local";
 import styles from "./Mascota.module.css";
 import MisionCard from "./MisionCard";
 import type { MisionAsignada } from "@/lib/misiones";
+
+const blackFlag = localFont({ src: "./fonts/BlackFlag.ttf" });
 
 const STAT_LABELS = {
   piernas: "Piernas",
@@ -42,40 +45,43 @@ export default function Mascota({
     <>
       <section
         data-mascota={clave}
-        className="flex min-h-40 flex-col items-center gap-2 overflow-hidden rounded-2xl border border-border bg-surface p-5 text-center"
+        className={styles.holderMascota}
       >
-        <h2 className="text-lg font-medium">{nombre}</h2>
+        <h2 className={styles.nombreMascota}>{nombre}</h2>
 
         <button
           type="button"
           popoverTarget="mascota-stats"
           aria-label={`Ver estadísticas de ${nombre}`}
-          className="rounded-2xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          className={styles.triggerMascota}
         >
           {inactiva ? (
             <span
               role="img"
               aria-label={`Tumba de ${nombre}`}
-              className="flex h-28 w-28 shrink-0 items-center justify-center rounded-2xl border border-border bg-surface-2 text-sm font-medium text-muted"
+              className={styles.tumbaHolder}
             >
               Tumba
             </span>
           ) : imagenUrl ? (
-            <Image
-              src={imagenUrl}
-              alt={`${nombre}, tu mascota virtual`}
-              width={128}
-              height={128}
-              className={`${styles.wiggle} h-28 w-28 shrink-0 object-contain`}
-            />
+            <span className={`${styles.wiggle} ${styles.marcoImagenMascota}`}>
+              <Image
+                src={imagenUrl}
+                alt={`${nombre}, tu mascota virtual`}
+                fill
+                loading="eager"
+                sizes="9rem"
+                className={styles.imagenMascota}
+              />
+            </span>
           ) : (
-            <span className="flex h-28 w-28 items-center justify-center text-sm text-muted">
+            <span className={styles.sinImagenHolder}>
               Imagen no disponible
             </span>
           )}
         </button>
 
-        <p className="text-sm text-muted">
+        <p className={styles.faseMascota}>
           {inactiva ? "Más de una semana sin actividad." : fase}
         </p>
       </section>
@@ -85,127 +91,152 @@ export default function Mascota({
         popover="auto"
         role="dialog"
         aria-labelledby="mascota-stats-title"
-        className="m-auto w-[min(90vw,24rem)] rounded-2xl border border-border bg-surface p-5 text-foreground shadow-2xl [&::backdrop]:bg-black/70"
+        className={styles.popoverCarta}
       >
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h2 id="mascota-stats-title" className="text-lg font-medium">
+        <button
+          type="button"
+          popoverTarget="mascota-stats"
+          popoverTargetAction="hide"
+          aria-label="Cerrar estadísticas"
+          className={styles.cerrarPopover}
+        >
+          ×
+        </button>
+
+        <div className={styles.contenidoPopover}>
+          <section className={styles.statsCarta}>
+            <h2 id="mascota-stats-title" className={styles.tituloStats}>
               Estadísticas de {nombre}
             </h2>
-            <p className="mt-1 text-sm text-muted">
+            <p className={styles.descripcionStats}>
               Realizar misiones sumará puntos a estos atributos.
             </p>
-          </div>
-          <button
-            type="button"
-            popoverTarget="mascota-stats"
-            popoverTargetAction="hide"
-            aria-label="Cerrar estadísticas"
-            className="rounded-lg px-2 py-1 text-muted hover:bg-surface-2 hover:text-foreground"
-          >
-            ×
-          </button>
-        </div>
+            <dl className={styles.listaStats}>
+              {(Object.entries(STAT_LABELS) as [Stat, string][]).map(([stat, label]) => {
+                const puntos = stats[stat];
+                const requisito = Math.max(minimoStatSiguiente, 1);
+                const porcentaje =
+                  minimoStatSiguiente > 0 ? Math.min(100, (puntos / requisito) * 100) : 0;
 
-        {inactiva ? (
-          <div className="mx-auto mt-4 flex h-28 w-28 items-center justify-center rounded-2xl border border-border bg-surface-2 text-sm font-medium text-muted">
-            Tumba
-          </div>
-        ) : imagenUrl ? (
-          <Image
-            src={imagenUrl}
-            alt={nombre}
-            width={128}
-            height={128}
-            className={`${styles.wiggleContinuo} mx-auto mt-4 h-28 w-28 object-contain`}
-          />
-        ) : (
-          <p className="mt-4 text-center text-sm text-muted">Imagen no disponible</p>
-        )}
+                return (
+                  <div
+                    key={stat}
+                    className={styles.filaStat}
+                  >
+                    <progress
+                      aria-label={`Progreso de ${label}`}
+                      aria-valuetext={
+                        minimoStatSiguiente > 0
+                          ? `${puntos} puntos de ${requisito} requeridos`
+                          : `${puntos} puntos; requisito no configurado`
+                      }
+                      max={100}
+                      value={porcentaje}
+                      className={styles.progresoStat}
+                    />
+                    <dt className={styles.textoStat}>{label}</dt>
+                    <dd className={styles.textoStat}>{puntos}</dd>
+                  </div>
+                );
+              })}
+            </dl>
+          </section>
 
-        <dl className="mt-4 flex flex-col gap-2">
-          {(Object.entries(STAT_LABELS) as [Stat, string][]).map(([stat, label]) => {
-            const puntos = stats[stat];
-            const requisito = Math.max(minimoStatSiguiente, 1);
-            const porcentaje =
-              minimoStatSiguiente > 0 ? Math.min(100, (puntos / requisito) * 100) : 0;
-
-            return (
-              <div
-                key={stat}
-                className="relative flex items-center justify-between overflow-hidden rounded-xl bg-surface-2 px-4 py-3 text-sm"
-              >
-                <div
-                  role="progressbar"
-                  aria-label={`Progreso de ${label}`}
-                  aria-valuemin={0}
-                  aria-valuemax={requisito}
-                  aria-valuenow={Math.min(puntos, requisito)}
-                  aria-valuetext={
-                    minimoStatSiguiente > 0
-                      ? `${puntos} puntos de ${requisito} requeridos`
-                      : `${puntos} puntos; requisito no configurado`
-                  }
-                  className="pointer-events-none absolute inset-y-0 left-0 bg-accent opacity-60 transition-[width]"
-                  style={{ width: `${porcentaje}%` }}
+          <div className={styles.escenaCarta} aria-label={`Carta de ${nombre}`}>
+            <div className={styles.carta}>
+              <div className={`${styles.caraCarta} ${styles.traseraCarta}`}>
+                <Image
+                  src="/images/mascota/cartatrasera.png"
+                  alt=""
+                  fill
+                  loading="eager"
+                  sizes="18rem"
+                  className={styles.fondoCarta}
                 />
-                <dt className="relative font-medium">{label}</dt>
-                <dd className="relative font-medium">{puntos}</dd>
               </div>
-            );
-          })}
-        </dl>
+
+              <div className={`${styles.caraCarta} ${styles.frontalCarta}`}>
+                <Image
+                  src="/images/mascota/cartafrontal.png"
+                  alt=""
+                  fill
+                  loading="eager"
+                  sizes="18rem"
+                  className={styles.fondoCarta}
+                />
+                <div className={`${styles.contenidoCarta} ${blackFlag.className}`}>
+                  <p className={styles.nombreCarta}>{nombre}</p>
+                  {inactiva ? (
+                    <span className={styles.tumbaCarta}>
+                      Tumba
+                    </span>
+                  ) : imagenUrl ? (
+                    <span className={`${styles.wiggleContinuo} ${styles.marcoImagenCarta}`}>
+                      <Image
+                        src={imagenUrl}
+                        alt={`${nombre}, tu mascota virtual`}
+                        fill
+                        sizes="(max-width: 639px) 5rem, 7rem"
+                        className={styles.imagenCarta}
+                      />
+                    </span>
+                  ) : (
+                    <span className={styles.sinImagenCarta}>Imagen no disponible</span>
+                  )}
+                  <p className={styles.faseCarta}>
+                    {inactiva ? "Inactiva" : fase}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <section
         aria-labelledby="metas-title"
-        className="flex flex-col gap-4 rounded-2xl border border-border bg-surface p-5"
+        className={styles.metas}
       >
-        <div className="flex items-start justify-between gap-4">
+        <div className={styles.encabezadoMetas}>
           <div>
-            <h2 id="metas-title" className="font-medium">
+            <h2 id="metas-title" className={styles.tituloMetas}>
               Tareas y metas
             </h2>
-            <p className="mt-1 text-sm text-muted">
+            <p className={styles.descripcionMetas}>
               Completa metas para hacer evolucionar a {nombre}.
             </p>
           </div>
-          <span className="text-sm font-medium text-accent">{progreso}%</span>
+          <span className={styles.porcentajeMetas}>{progreso}%</span>
         </div>
 
-        <div
-          role="progressbar"
+        <progress
           aria-label="Progreso para la siguiente evolución"
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-valuenow={progreso}
-          className="h-3 w-full overflow-hidden rounded-full bg-surface-2"
-        >
-          <div
-            className="h-full rounded-full bg-accent transition-[width]"
-            style={{ width: `${progreso}%` }}
-          />
-        </div>
+          max={100}
+          value={progreso}
+          className={styles.barraEvolucion}
+        />
 
-        <div className="grid gap-3 sm:grid-cols-2">
-          <div className="rounded-xl border border-border bg-surface-2 p-4">
-            <h3 className="text-sm font-medium">Metas diarias</h3>
+        <div className={styles.gridMetas}>
+          <div className={styles.grupoMetas}>
+            <h3 className={styles.tituloGrupoMetas}>Metas diarias</h3>
             {!misionesDiarias.length ? (
-              <p className="mt-2 text-sm text-muted">Día de descanso: no tienes rutina asignada.</p>
+              <p className={styles.estadoMetas}>Día de descanso: no tienes rutina asignada.</p>
             ) : (
-              <div className="mt-3 flex flex-col gap-2">
+              <div className={styles.listaMisiones}>
                 {misionesDiarias.map((mision) => (
                   <MisionCard key={mision.id} mision={mision} registrable />
                 ))}
               </div>
             )}
           </div>
-          <div className="rounded-xl border border-border bg-surface-2 p-4">
-            <h3 className="text-sm font-medium">Metas semanales</h3>
+          <div className={styles.grupoMetas}>
+            <h3 className={styles.tituloGrupoMetas}>Metas semanales</h3>
             {!misionesSemanales.length ? (
-              <p className="mt-2 text-sm text-muted">Crea y programa una rutina para obtener metas.</p>
+              <p className={styles.estadoMetas}>
+                Crea y programa una rutina para obtener metas.
+              </p>
             ) : (
-              <div className="mt-3 flex flex-col gap-2">
+              <div className={styles.listaMisiones}>
                 {misionesSemanales.map((mision) => (
                   <MisionCard key={mision.id} mision={mision} />
                 ))}
