@@ -4,6 +4,11 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { getExercises } from "@/lib/exercises";
 import type { Categoria } from "@/lib/categorias";
 
+// Tope de misiones diarias. Si las rutinas del día tienen menos ejercicios, se
+// generan menos: no se rellena con el catálogo. El check de usuario_misiones acepta
+// slots 1..6, así que bajar el tope no necesita migración.
+const MAX_DIARIAS = 5;
+
 export const STATS_MASCOTA = ["piernas", "brazos", "pecho", "abdomen", "espalda"] as const;
 export type StatMascota = (typeof STATS_MASCOTA)[number];
 export type NivelEntrenamiento = "principiante" | "intermedio" | "avanzado";
@@ -202,7 +207,7 @@ export async function asegurarMisionesActuales(
   const [{ data: existentesRaw }, { data: diasRutina }, { data: recompensas }] = await Promise.all([
     supabase
       .from("usuario_misiones")
-      .select("frecuencia, periodo_inicio, rutina_id")
+      .select("frecuencia, periodo_inicio, rutina_id, ejercicio_id")
       .eq("user_id", userId)
       .in("periodo_inicio", [hoy, semana]),
     supabase.from("rutina_dias").select("rutina_id, dia_semana").eq("user_id", userId),
@@ -256,9 +261,18 @@ export async function asegurarMisionesActuales(
   );
   const diariasCubiertas = new Set(diariasExistentes.map((mission) => mission.rutina_id).filter(Boolean));
   const semanalesCubiertas = new Set(semanalesExistentes.map((mission) => mission.rutina_id).filter(Boolean));
+  // Una diaria que ya no apunta a un ejercicio de las rutinas de hoy quedó obsoleta:
+  // le quitaron el ejercicio, la rutina cambió de día, o es un resto del relleno del
+  // catálogo que ya no se genera. Comparar por ejercicio y no solo por rutina es lo
+  // que hace que quitar un ejercicio se refleje en la lista.
+  const ejerciciosHoy = new Set(
+    ejercicios
+      .filter((exercise) => rutinasHoy.includes(exercise.rutina_id!))
+      .map((exercise) => exercise.ejercicio_id)
+  );
   const diariasDesactualizadas = diariasExistentes.length > 0 && (
-    diariasExistentes.some((mission) => mission.rutina_id && !rutinasHoy.includes(mission.rutina_id))
-    || rutinasHoyConEjercicios.length <= slotsDisponibles("diaria", hoy, 6).length
+    diariasExistentes.some((mission) => !ejerciciosHoy.has(mission.ejercicio_id))
+    || rutinasHoyConEjercicios.length <= slotsDisponibles("diaria", hoy, MAX_DIARIAS).length
       && rutinasHoyConEjercicios.some((rutinaId) => !diariasCubiertas.has(rutinaId))
   );
   const semanalesDesactualizadas = semanalesExistentes.length > 0 && (
@@ -294,14 +308,16 @@ export async function asegurarMisionesActuales(
   );
 
   if (!tieneDiarias && rutinasHoy.length) {
-    const slots = slotsDisponibles("diaria", hoy, 6);
+    const slots = slotsDisponibles("diaria", hoy, MAX_DIARIAS);
     const hoySet = new Set(rutinasHoy);
-    const candidatas = seleccionarPorRutina(
+    // Solo ejercicios de las rutinas del día, nunca del catálogo: la meta diaria es
+    // hacer tu rutina. Con varias rutinas asignadas al mismo día seleccionarPorRutina
+    // las intercala, y el seed del día decide cuáles de los ejercicios entran.
+    const seleccionadas = seleccionarPorRutina(
       ejercicios.filter((exercise) => hoySet.has(exercise.rutina_id!)),
-      6,
+      MAX_DIARIAS,
       `${userId}:${hoy}`
-    );
-    const seleccionadas = completarConCatalogo(candidatas, 6, `${userId}:${hoy}`).slice(0, slots.length);
+    ).slice(0, slots.length);
     if (seleccionadas.length) {
       const { error } = await supabase.from("usuario_misiones").insert(
         filasMision({
