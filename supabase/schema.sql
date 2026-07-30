@@ -922,9 +922,20 @@ with check (
     and periodo_inicio = fecha_local_actual() - (extract(isodow from fecha_local_actual())::int - 1)
   )
   and (
+    -- Los slots que las rutinas del día no alcanzan a llenar se completan con el
+    -- catálogo (rutina_id null). El id es un slug de data/exercises.json, que
+    -- Postgres no puede joinear, así que lo único verificable acá es el stat: tiene
+    -- que ser uno que alguna rutina del usuario entrene, que es lo que decide los
+    -- puntos. Antes esto exigía ids correlativos ('pecho-1'), que desaparecieron con
+    -- el catálogo nuevo: el filler ya no pasaba el check y se caía el insert entero,
+    -- dejando el día sin ninguna misión.
     rutina_id is null
-    and ejercicio_id ~ '^(pecho-[1-6]|espalda-[1-6]|brazos-[1-8]|piernas-[1-6]|abdomen-[1-6])$'
-    and stat = split_part(ejercicio_id, '-', 1)
+    and exists (
+      select 1
+      from rutinas r
+      join rutina_ejercicios re on re.rutina_id = r.id
+      where r.user_id = auth.uid() and re.categoria = usuario_misiones.stat
+    )
     or exists (
       select 1
       from rutinas r

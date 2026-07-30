@@ -50,7 +50,7 @@ function inicioSemana(fecha: string) {
   return localNoon.toISOString().slice(0, 10);
 }
 
-function diaSemana(fecha: string) {
+export function diaSemana(fecha: string) {
   return new Date(`${fecha}T12:00:00Z`).getUTCDay();
 }
 
@@ -296,7 +296,7 @@ export async function asegurarMisionesActuales(
     );
     const seleccionadas = completarConCatalogo(candidatas, 6, `${userId}:${hoy}`).slice(0, slots.length);
     if (seleccionadas.length) {
-      await supabase.from("usuario_misiones").insert(
+      const { error } = await supabase.from("usuario_misiones").insert(
         filasMision({
           ejercicios: seleccionadas,
           frecuencia: "diaria",
@@ -310,6 +310,9 @@ export async function asegurarMisionesActuales(
           userId,
         })
       );
+      // Un rechazo del RLS bota el insert completo y el home queda sin misiones,
+      // idéntico a no tener rutinas: sin esto no hay forma de notarlo.
+      if (error) console.error("misiones diarias:", error);
     }
   }
 
@@ -346,7 +349,7 @@ export async function asegurarMisionesActuales(
       ])
     );
     if (seleccionadas.length) {
-      await supabase.from("usuario_misiones").insert(
+      const { error } = await supabase.from("usuario_misiones").insert(
         filasMision({
           ejercicios: seleccionadas.slice(0, 4),
           frecuencia: "semanal",
@@ -360,6 +363,7 @@ export async function asegurarMisionesActuales(
           userId,
         })
       );
+      if (error) console.error("misiones semanales:", error);
     }
   }
 }

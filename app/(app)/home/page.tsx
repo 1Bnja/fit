@@ -6,6 +6,7 @@ import {
 } from "@/lib/mascota.mjs";
 import {
   asegurarMisionesActuales,
+  diaSemana,
   periodosActuales,
   type MisionAsignada,
   type NivelEntrenamiento,
@@ -22,19 +23,16 @@ export default async function HomePage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const hoy = new Date().getDay();
-
-  const [{ data: profile }, { data: rutinasHoy }, { data: mascotaUsuario }] = await Promise.all([
+  const [{ data: profile }, { data: rutinaDias }, { data: mascotaUsuario }] = await Promise.all([
     supabase
       .from("profiles")
       .select("nombre, peso_kg, estatura_cm, created_at, last_active_at, nivel_entrenamiento, timezone")
       .eq("id", user!.id)
       .single(),
-    supabase
-      .from("rutina_dias")
-      .select("rutinas(id, nombre)")
-      .eq("user_id", user!.id)
-      .eq("dia_semana", hoy),
+    // El día se filtra después, con la zona del perfil: el server corre en UTC y
+    // en Chile eso adelanta el día desde las 20:00, mostrando la rutina de mañana
+    // mientras las misiones son las de hoy.
+    supabase.from("rutina_dias").select("dia_semana, rutinas(id, nombre)").eq("user_id", user!.id),
     supabase
       .from("usuario_mascotas")
       .select(`
@@ -83,6 +81,9 @@ export default async function HomePage() {
     timezone: profile?.timezone ?? "America/Santiago",
   });
   const periodos = periodosActuales(profile?.timezone ?? "America/Santiago");
+  const rutinasHoy = (rutinaDias ?? []).filter(
+    (row) => row.dia_semana === diaSemana(periodos.hoy)
+  );
   const { data: misiones } = await supabase
     .from("usuario_misiones")
     .select("id, frecuencia, ejercicio_id, ejercicio_nombre, stat, series_objetivo, dias_objetivo, dias_completados, reps_objetivo, peso_sugerido_kg, progreso, puntos_evolucion, puntos_stat, completada_at")
