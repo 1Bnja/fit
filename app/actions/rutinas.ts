@@ -7,6 +7,11 @@ import { exerciseById } from "@/lib/exercises";
 
 export type FormState = { error?: string };
 
+async function invalidarMisionesActuales(supabase: Awaited<ReturnType<typeof createClient>>) {
+  await supabase.rpc("invalidar_misiones_actuales");
+  revalidatePath("/home");
+}
+
 export async function crearRutina(_prev: FormState, formData: FormData): Promise<FormState> {
   const nombre = String(formData.get("nombre") ?? "").trim();
   if (!nombre) return { error: "Ingresa un nombre para la rutina." };
@@ -36,6 +41,7 @@ export async function eliminarRutina(rutinaId: string) {
   if (!user) redirect("/login");
 
   await supabase.from("rutinas").delete().eq("id", rutinaId).eq("user_id", user!.id);
+  await invalidarMisionesActuales(supabase);
   redirect("/rutinas");
 }
 
@@ -54,6 +60,7 @@ export async function asignarDias(rutinaId: string, dias: number[]) {
       .insert(dias.map((dia_semana) => ({ rutina_id: rutinaId, user_id: user!.id, dia_semana })));
   }
 
+  await invalidarMisionesActuales(supabase);
   revalidatePath(`/rutinas/${rutinaId}`);
 }
 
@@ -64,6 +71,10 @@ export async function agregarEjercicios(rutinaId: string, ids: string[]) {
   if (!ejercicios.length) return;
 
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
 
   const { data: existentes } = await supabase
     .from("rutina_ejercicios")
@@ -74,21 +85,28 @@ export async function agregarEjercicios(rutinaId: string, ids: string[]) {
 
   let orden = (existentes?.[0]?.orden ?? -1) + 1;
 
-  await supabase.from("rutina_ejercicios").insert(
+  const { error } = await supabase.from("rutina_ejercicios").insert(
     ejercicios.map((e) => ({
       rutina_id: rutinaId,
       ejercicio_id: e.id,
       ejercicio_nombre: e.nombre,
+      categoria: e.categoria,
       orden: orden++,
     }))
   );
 
+  // Sin esto el insert falla en silencio y la UI se ve igual que si no hubieras
+  // apretado nada: así se pasó una columna que ya no existía.
+  if (error) console.error("agregarEjercicios:", error);
+
+  await invalidarMisionesActuales(supabase);
   revalidatePath(`/rutinas/${rutinaId}`);
 }
 
 export async function quitarEjercicio(rutinaId: string, rutinaEjercicioId: string) {
   const supabase = await createClient();
   await supabase.from("rutina_ejercicios").delete().eq("id", rutinaEjercicioId);
+  await invalidarMisionesActuales(supabase);
   revalidatePath(`/rutinas/${rutinaId}`);
 }
 

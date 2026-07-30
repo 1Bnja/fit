@@ -1,19 +1,33 @@
 import raw from "@/data/exercises.json";
-import type { Musculo } from "@/lib/categorias";
+import { categoriaDe, type Categoria, type Musculo } from "@/lib/categorias";
 
-export interface Exercise {
+type RawExercise = {
   id: string;
   nombre: string;
   /** Nombre en inglés. Solo se usa para que el buscador encuentre "bench press". */
   en: string;
   musculo: Musculo;
   secundarios: Musculo[];
-}
+};
+
+export type Exercise = RawExercise & {
+  categoria: Categoria;
+};
 
 // La integridad del catálogo (músculos válidos, ids únicos) la valida
 // scripts/check-catalogo.mjs en CI, no en runtime.
-const exercises = raw as Exercise[];
+const exercises = (raw as RawExercise[]).map((exercise) => ({
+  ...exercise,
+  categoria: categoriaDe(exercise.musculo),
+}));
 
+export function getExercises(): Exercise[] {
+  return exercises;
+}
+
+export function exercisesByCategoria(categoria: Categoria): Exercise[] {
+  return exercises.filter((e) => e.categoria === categoria);
+}
 const porId = new Map(exercises.map((e) => [e.id, e]));
 
 export function exerciseById(id: string): Exercise | undefined {

@@ -1,51 +1,45 @@
-"use client";
+import OnboardingForm, {
+  type MascotaInicial,
+} from "@/components/mascota/OnboardingForm";
+import { obtenerImagenFaseDisponible } from "@/lib/mascota.mjs";
+import { createClient } from "@/lib/supabase/server";
 
-import { useActionState } from "react";
-import { Dumbbell, Scale, Ruler } from "reicon-react";
-import Field from "@/components/Field";
-import { completarOnboarding, type OnboardingState } from "@/app/actions/onboarding";
+type FaseCatalogo = {
+  numero: number;
+  imagen_url: string | null;
+  updated_at: string | null;
+};
 
-const initialState: OnboardingState = {};
+type MascotaCatalogo = {
+  clave: string;
+  nombre: string;
+  descripcion: string;
+  mascota_fases: FaseCatalogo[] | null;
+};
 
-export default function OnboardingPage() {
-  const [state, formAction, pending] = useActionState(completarOnboarding, initialState);
+export default async function OnboardingPage() {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("mascotas")
+    .select(`
+      clave,
+      nombre,
+      descripcion,
+      mascota_fases (
+        numero,
+        imagen_url,
+        updated_at
+      )
+    `)
+    .eq("disponible", true)
+    .order("orden");
 
-  return (
-    <div className="flex flex-1 items-center justify-center p-4">
-      <div className="w-full max-w-sm">
-        <div className="mb-6 flex flex-col items-center gap-2">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent text-accent-foreground">
-            <Dumbbell size={24} />
-          </div>
-        </div>
-        <form
-          action={formAction}
-          className="flex w-full flex-col gap-4 rounded-2xl border border-border bg-surface p-6"
-        >
-          <div>
-            <h1 className="text-lg font-medium">Completa tu perfil</h1>
-            <p className="text-sm text-muted">Necesitamos tu peso y estatura para empezar.</p>
-          </div>
+  const mascotas: MascotaInicial[] = ((data ?? []) as MascotaCatalogo[]).map((mascota) => ({
+    clave: mascota.clave,
+    nombre: mascota.nombre,
+    descripcion: mascota.descripcion,
+    imagenUrl: obtenerImagenFaseDisponible(mascota.mascota_fases ?? [], 1),
+  }));
 
-          <Field label="Peso (kg)" icon={<Scale size={16} />}>
-            <input id="peso_kg" name="peso_kg" type="number" step="0.1" min="0" required />
-          </Field>
-
-          <Field label="Estatura (cm)" icon={<Ruler size={16} />}>
-            <input id="estatura_cm" name="estatura_cm" type="number" step="0.1" min="0" required />
-          </Field>
-
-          {state.error && <p className="text-sm text-danger">{state.error}</p>}
-
-          <button
-            type="submit"
-            disabled={pending}
-            className="mt-2 rounded-xl bg-accent px-4 py-2.5 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
-          >
-            {pending ? "Guardando..." : "Continuar"}
-          </button>
-        </form>
-      </div>
-    </div>
-  );
+  return <OnboardingForm mascotas={mascotas} catalogoDisponible={!error && mascotas.length > 0} />;
 }

@@ -14,7 +14,7 @@ export default async function RutinaPage({ params }: { params: Promise<{ id: str
     supabase.from("rutinas").select("id, nombre").eq("id", id).eq("user_id", user!.id).single(),
     supabase
       .from("rutina_ejercicios")
-      .select("id, ejercicio_id, ejercicio_nombre")
+      .select("id, ejercicio_id, ejercicio_nombre, categoria")
       .eq("rutina_id", id)
       .order("orden", { ascending: true }),
     supabase.from("rutina_dias").select("dia_semana").eq("rutina_id", id).eq("user_id", user!.id),
