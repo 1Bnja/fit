@@ -2,7 +2,9 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Weight, Trash, Check, ChevronDown } from "reicon-react";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { Weight, Trash, Check, ChevronDown, Menu } from "reicon-react";
 import { registrarPeso } from "@/app/actions/registros";
 import ProgresoChart from "@/components/ProgresoChart";
 
@@ -41,12 +43,14 @@ function etiquetaFecha(fecha: Date) {
 }
 
 export default function EjercicioRow({
+  id,
   rutinaId,
   ejercicioId,
   ejercicioNombre,
   historial,
   onQuitar,
 }: {
+  id: string;
   rutinaId: string;
   ejercicioId: string;
   ejercicioNombre: string;
@@ -58,24 +62,51 @@ export default function EjercicioRow({
   const [abierto, setAbierto] = useState(false);
   const [peso, setPeso] = useState("");
   const [reps, setReps] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id,
+  });
+  const style = { transform: CSS.Transform.toString(transform), transition };
 
   function guardar() {
     const pesoKg = Number(peso);
-    if (!pesoKg) return;
+    const repsNumero = Number(reps);
+    if (!pesoKg || !repsNumero) {
+      setError("Ingresa peso y repeticiones.");
+      return;
+    }
 
     startTransition(async () => {
-      await registrarPeso(rutinaId, ejercicioId, ejercicioNombre, pesoKg, reps ? Number(reps) : null);
+      const result = await registrarPeso(rutinaId, ejercicioId, ejercicioNombre, pesoKg, repsNumero);
+      if (result.error) {
+        setError(result.error);
+        return;
+      }
+      setError(null);
       router.refresh();
+      setPeso("");
+      setReps("");
     });
-    setPeso("");
-    setReps("");
   }
 
   const ultimo = historial[0];
 
   return (
-    <li className="rounded-2xl border border-border bg-surface text-sm">
+    <li
+      ref={setNodeRef}
+      style={style}
+      className={`rounded-2xl border border-border bg-surface text-sm ${isDragging ? "z-10 opacity-50" : ""}`}
+    >
       <div className="flex items-center justify-between p-3">
+        <button
+          type="button"
+          {...attributes}
+          {...listeners}
+          aria-label="Arrastrar para reordenar"
+          className="flex h-10 w-10 shrink-0 touch-none items-center justify-center rounded-lg text-muted hover:bg-surface-2 active:cursor-grabbing"
+        >
+          <Menu size={16} />
+        </button>
         <button
           type="button"
           onClick={() => setAbierto((v) => !v)}
@@ -98,7 +129,7 @@ export default function EjercicioRow({
           type="button"
           onClick={onQuitar}
           aria-label="Quitar ejercicio"
-          className="flex h-8 w-8 items-center justify-center rounded-lg text-muted hover:bg-surface-2 hover:text-danger"
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-muted hover:bg-surface-2 hover:text-danger"
         >
           <Trash size={16} />
         </button>
@@ -125,7 +156,7 @@ export default function EjercicioRow({
                 min="0"
                 value={reps}
                 onChange={(ev) => setReps(ev.target.value)}
-                placeholder="Opcional"
+                placeholder="Requeridas"
               />
             </label>
             <button
@@ -138,6 +169,8 @@ export default function EjercicioRow({
               <Check size={16} />
             </button>
           </div>
+
+          {error && <p className="text-xs text-danger">{error}</p>}
 
           {historial.length > 0 && (
             <div className="flex flex-col gap-1.5">

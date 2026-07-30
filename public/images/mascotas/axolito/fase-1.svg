@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title">
+  <title id="title">Axolito en su fase inicial</title>
+  <g stroke="#15131f" stroke-linecap="round" stroke-linejoin="round" stroke-width="14">
+    <path fill="#38bdf8" d="M112 184 56 123m70 31-13-84m36 79 33-72m218 107 56-61m-70 31 13-84m-36 79-33-72"/>
+    <path fill="#f9a8d4" d="M119 225c0-76 58-132 137-132s137 56 137 132v75c0 73-58 125-137 125s-137-52-137-125v-75Z"/>
+    <path fill="#fbcfe8" d="M151 281c37 20 67 15 105-4 38 19 68 24 105 4-5 73-45 112-105 112s-100-39-105-112Z"/>
+    <circle cx="205" cy="237" r="12" fill="#15131f" stroke="none"/>
+    <circle cx="307" cy="237" r="12" fill="#15131f" stroke="none"/>
+    <circle cx="201" cy="233" r="4" fill="#fff" stroke="none"/>
+    <circle cx="303" cy="233" r="4" fill="#fff" stroke="none"/>
+    <path fill="none" d="M222 293c20 18 48 18 68 0"/>
+    <path fill="#f472b6" d="M128 216 65 198l44 48-50 24 66 7m259-61 63-18-44 48 50 24-66 7"/>
+    <path fill="#f9a8d4" d="M189 403c-20 10-33 31-28 53h63l12-47m87-6c20 10 33 31 28 53h-63l-12-47"/>
+    <path fill="#67e8f9" d="M373 348c49 7 79 35 79 69-35-21-77-15-108 18l-18-43c10-19 26-36 47-44Z"/>
+  </g>
+</svg>

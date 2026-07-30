@@ -1,6 +1,21 @@
 import { createClient } from "@/lib/supabase/server";
+import {
+  mascotaEstaInactiva,
+  obtenerEvolucionMascota,
+  obtenerImagenFaseDisponible,
+} from "@/lib/mascota.mjs";
+import {
+  asegurarMisionesActuales,
+  diaSemana,
+  periodosActuales,
+  type MisionAsignada,
+  type NivelEntrenamiento,
+  type StatMascota,
+} from "@/lib/misiones";
+import Mascota from "@/components/mascota/Mascota";
 import { Scale, Ruler, Flame, ChevronRight, Dumbbell } from "reicon-react";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 export default async function HomePage() {
   const supabase = await createClient();
@@ -8,16 +23,84 @@ export default async function HomePage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const hoy = new Date().getDay();
-
-  const [{ data: profile }, { data: rutinasHoy }] = await Promise.all([
-    supabase.from("profiles").select("nombre, peso_kg, estatura_cm").eq("id", user!.id).single(),
+  const [{ data: profile }, { data: rutinaDias }, { data: mascotaUsuario }] = await Promise.all([
     supabase
-      .from("rutina_dias")
-      .select("rutinas(id, nombre)")
+      .from("profiles")
+      .select("nombre, peso_kg, estatura_cm, created_at, last_active_at, nivel_entrenamiento, timezone")
+      .eq("id", user!.id)
+      .single(),
+    // El día se filtra después, con la zona del perfil: el server corre en UTC y
+    // en Chile eso adelanta el día desde las 20:00, mostrando la rutina de mañana
+    // mientras las misiones son las de hoy.
+    supabase.from("rutina_dias").select("dia_semana, rutinas(id, nombre)").eq("user_id", user!.id),
+    supabase
+      .from("usuario_mascotas")
+      .select(`
+        xp,
+        estado,
+        piernas,
+        brazos,
+        pecho,
+        abdomen,
+        espalda,
+        mascotas (
+          clave,
+          nombre,
+          mascota_fases (
+            numero,
+            nombre,
+            xp_requerida,
+            stat_minima_requerida,
+            imagen_url,
+            updated_at
+          )
+        )
+      `)
       .eq("user_id", user!.id)
-      .eq("dia_semana", hoy),
+      .eq("seleccionada", true)
+      .maybeSingle(),
   ]);
+
+  const mascota = Array.isArray(mascotaUsuario?.mascotas)
+    ? mascotaUsuario.mascotas[0]
+    : mascotaUsuario?.mascotas;
+  if (!mascotaUsuario || !mascota) {
+    redirect("/mascotas");
+  }
+
+  const fasesMascota = mascota?.mascota_fases ?? [];
+  const stats = {
+    piernas: mascotaUsuario?.piernas ?? 0,
+    brazos: mascotaUsuario?.brazos ?? 0,
+    pecho: mascotaUsuario?.pecho ?? 0,
+    abdomen: mascotaUsuario?.abdomen ?? 0,
+    espalda: mascotaUsuario?.espalda ?? 0,
+  } satisfies Record<StatMascota, number>;
+  await asegurarMisionesActuales(supabase, user!.id, {
+    nivel: (profile?.nivel_entrenamiento ?? "principiante") as NivelEntrenamiento,
+    timezone: profile?.timezone ?? "America/Santiago",
+  });
+  const periodos = periodosActuales(profile?.timezone ?? "America/Santiago");
+  const rutinasHoy = (rutinaDias ?? []).filter(
+    (row) => row.dia_semana === diaSemana(periodos.hoy)
+  );
+  const { data: misiones } = await supabase
+    .from("usuario_misiones")
+    .select("id, frecuencia, ejercicio_id, ejercicio_nombre, stat, series_objetivo, dias_objetivo, dias_completados, reps_objetivo, peso_sugerido_kg, progreso, puntos_evolucion, puntos_stat, completada_at")
+    .eq("user_id", user!.id)
+    .in("periodo_inicio", [periodos.hoy, periodos.semana])
+    .order("frecuencia")
+    .order("slot");
+  const xp = mascotaUsuario?.xp ?? 0;
+  const { faseActual, siguiente, progreso } = obtenerEvolucionMascota(
+    fasesMascota,
+    xp,
+    stats
+  );
+  const imagenMascota = obtenerImagenFaseDisponible(fasesMascota, faseActual?.numero);
+  const mostrarTumba =
+    mascotaUsuario?.estado === "tumba" ||
+    mascotaEstaInactiva(profile?.last_active_at ?? profile?.created_at);
 
   return (
     <div className="flex flex-col gap-6">
@@ -34,6 +117,21 @@ export default async function HomePage() {
           </div>
         </div>
       </div>
+
+      <Mascota
+        clave={mascota.clave}
+        nombre={mascota.nombre}
+        fase={faseActual?.nombre ?? "Fase inicial"}
+        imagenUrl={imagenMascota}
+        inactiva={mostrarTumba}
+        progreso={progreso}
+        stats={stats}
+        misionesDiarias={((misiones ?? []).filter((mision) => mision.frecuencia === "diaria") as MisionAsignada[])}
+        misionesSemanales={((misiones ?? []).filter((mision) => mision.frecuencia === "semanal") as MisionAsignada[])}
+        minimoStatSiguiente={
+          siguiente?.stat_minima_requerida ?? faseActual?.stat_minima_requerida ?? 0
+        }
+      />
 
       <div>
         <h2 className="mb-2 flex items-center gap-1.5 text-sm font-medium text-muted">

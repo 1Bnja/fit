@@ -16,14 +16,16 @@ No existe un backend HTTP separado: las paginas leen Supabase desde Server Compo
 | [Sistemas funcionales](./SYSTEMS.md) | Funcionalidades de autenticacion, perfil, rutinas, progreso, grupos y PWA |
 | [Datos y seguridad](./DATA-AND-SECURITY.md) | Modelo relacional, RLS, funciones SQL, triggers y Storage |
 | [Desarrollo y operaciones](./DEVELOPMENT.md) | Herramientas, configuracion local, scripts, despliegue y estado de calidad |
+| [Sistema de mascotas](./MASCOTAS.md) | Catalogo escalable, ocho fases, imagenes, seleccion y migracion |
 
 ## Capacidades actuales
 
 - Registro, inicio y cierre de sesion con Supabase Auth.
-- Onboarding obligatorio con peso y estatura.
+- Onboarding obligatorio con peso, estatura y eleccion entre cuatro mascotas.
+- Mascotas con progreso equilibrado, ocho fases y recursos reemplazables.
 - Perfil editable con nombre de usuario unico y avatar.
 - Creacion y eliminacion de rutinas; asignacion semanal de dias.
-- Catalogo de 19 ejercicios en cuatro categorias y ejercicios personalizados.
+- Catalogo de 200 ejercicios en cinco categorias y nueve musculos, con buscador.
 - Registro de multiples series con peso y repeticiones.
 - Historial diario y grafico de progreso por ejercicio.
 - Grupos privados con codigo de invitacion, actividad, comparacion y rutinas compartidas.
@@ -38,13 +40,14 @@ data/                  Catalogo estatico de ejercicios
 lib/                   Clientes Supabase y utilidades de dominio
 public/                Manifest, service worker, iconos y recursos PWA
 supabase/schema.sql    Esquema completo, RLS, funciones y triggers
+supabase/migrations/   Cambios incrementales para bases existentes
 proxy.ts               Sesion, proteccion de rutas y gate de onboarding
 ```
 
 ## Fuente de verdad
 
 - Comportamiento de aplicacion: `app/`, `components/` y `lib/`.
-- Persistencia y autorizacion: `supabase/schema.sql`.
+- Persistencia y autorizacion: `supabase/schema.sql` y `supabase/migrations/`.
 - Dependencias y comandos: `package.json` y `package-lock.json`.
 - Convenciones del framework: `node_modules/next/dist/docs/`, obligatorio antes de cambiar codigo Next.js en este repositorio.
 

@@ -119,10 +119,10 @@ Hay `loading.tsx` para home, listados de rutinas/grupos y detalles dinamicos. No
 
 | Componente | Rol |
 | --- | --- |
-| `RutinaEditor` | Maquina de vistas para dias, categorias, seleccion y ejercicios personalizados |
+| `RutinaEditor` | Maquina de vistas para dias, categorias, busqueda y seleccion de ejercicios |
 | `EjercicioRow` | Registro de series, ultimo valor, historial agrupado y expansion de detalle |
 | `ProgresoChart` | Grafico de hasta 20 registros recientes |
-| `CategoriaGrid` | Selector visual de cuatro grupos musculares |
+| `CategoriaGrid` | Selector visual de cinco categorias musculares |
 | `PerfilForm` | Edicion de datos y previsualizacion/subida de avatar |
 | `GrupoHeader` | Miembros, codigo y copia del enlace de invitacion |
 | `NavTabs` | Navegacion persistente entre home, rutinas y grupos |

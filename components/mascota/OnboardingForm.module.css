@@ -1,0 +1,126 @@
+.selector {
+  min-inline-size: 0;
+  padding: 0;
+  border: 0;
+}
+
+.leyenda {
+  color: var(--foreground);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.ayuda {
+  margin-top: 0.2rem;
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+.opciones {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.opcion {
+  position: relative;
+  min-width: 0;
+}
+
+.radio {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.tarjeta {
+  display: flex;
+  height: 100%;
+  min-height: 12.5rem;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 0.875rem;
+  background:
+    radial-gradient(circle at 50% 32%, rgb(108 92 231 / 18%), transparent 42%),
+    var(--surface-2);
+  text-align: center;
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease,
+    transform 150ms ease;
+}
+
+.opcion:hover .tarjeta {
+  border-color: rgb(108 92 231 / 68%);
+  transform: translateY(-1px);
+}
+
+.opcion:has(.radio:checked) .tarjeta {
+  border-color: var(--accent);
+  box-shadow:
+    inset 0 0 0 1px var(--accent),
+    0 0 1.2rem rgb(108 92 231 / 18%);
+}
+
+.opcion:has(.radio:focus-visible) .tarjeta {
+  outline: 2px solid var(--accent-foreground);
+  outline-offset: 3px;
+}
+
+.marcoImagen {
+  position: relative;
+  display: grid;
+  width: min(100%, 7rem);
+  aspect-ratio: 1;
+  place-items: center;
+}
+
+.imagen {
+  object-fit: contain;
+  padding: 0.25rem;
+}
+
+.sinImagen {
+  color: var(--muted);
+  font-size: 0.7rem;
+}
+
+.nombre {
+  margin-top: 0.35rem;
+  color: var(--foreground);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.descripcion {
+  margin-top: 0.25rem;
+  color: var(--muted);
+  font-size: 0.7rem;
+  line-height: 1.35;
+}
+
+.errorCatalogo {
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  border: 1px solid rgb(239 68 68 / 45%);
+  border-radius: 0.75rem;
+  color: var(--danger);
+  font-size: 0.8rem;
+}
+
+@media (min-width: 40rem) {
+  .opciones {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tarjeta {
+    transition: none;
+  }
+}

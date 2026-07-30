@@ -3,9 +3,14 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import type { Categoria } from "@/lib/categorias";
+import { exerciseById } from "@/lib/exercises";
 
 export type FormState = { error?: string };
+
+async function invalidarMisionesActuales(supabase: Awaited<ReturnType<typeof createClient>>) {
+  await supabase.rpc("invalidar_misiones_actuales");
+  revalidatePath("/home");
+}
 
 export async function crearRutina(_prev: FormState, formData: FormData): Promise<FormState> {
   const nombre = String(formData.get("nombre") ?? "").trim();
@@ -36,6 +41,7 @@ export async function eliminarRutina(rutinaId: string) {
   if (!user) redirect("/login");
 
   await supabase.from("rutinas").delete().eq("id", rutinaId).eq("user_id", user!.id);
+  await invalidarMisionesActuales(supabase);
   redirect("/rutinas");
 }
 
@@ -54,14 +60,21 @@ export async function asignarDias(rutinaId: string, dias: number[]) {
       .insert(dias.map((dia_semana) => ({ rutina_id: rutinaId, user_id: user!.id, dia_semana })));
   }
 
+  await invalidarMisionesActuales(supabase);
   revalidatePath(`/rutinas/${rutinaId}`);
 }
 
-export async function agregarEjercicios(
-  rutinaId: string,
-  ejercicios: { id: string; nombre: string; esCustom: boolean }[]
-) {
+export async function agregarEjercicios(rutinaId: string, ids: string[]) {
+  // El nombre sale del catálogo, no del cliente: es el que queda congelado en la
+  // fila si el ejercicio después se edita o se saca del catálogo.
+  const ejercicios = ids.map(exerciseById).filter((e) => e !== undefined);
+  if (!ejercicios.length) return;
+
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
 
   const { data: existentes } = await supabase
     .from("rutina_ejercicios")
@@ -72,43 +85,37 @@ export async function agregarEjercicios(
 
   let orden = (existentes?.[0]?.orden ?? -1) + 1;
 
-  await supabase.from("rutina_ejercicios").insert(
+  const { error } = await supabase.from("rutina_ejercicios").insert(
     ejercicios.map((e) => ({
       rutina_id: rutinaId,
       ejercicio_id: e.id,
       ejercicio_nombre: e.nombre,
-      es_custom: e.esCustom,
+      categoria: e.categoria,
       orden: orden++,
     }))
   );
 
+  // Sin esto el insert falla en silencio y la UI se ve igual que si no hubieras
+  // apretado nada: así se pasó una columna que ya no existía.
+  if (error) console.error("agregarEjercicios:", error);
+
+  await invalidarMisionesActuales(supabase);
   revalidatePath(`/rutinas/${rutinaId}`);
 }
 
 export async function quitarEjercicio(rutinaId: string, rutinaEjercicioId: string) {
   const supabase = await createClient();
   await supabase.from("rutina_ejercicios").delete().eq("id", rutinaEjercicioId);
+  await invalidarMisionesActuales(supabase);
   revalidatePath(`/rutinas/${rutinaId}`);
 }
 
-export async function crearEjercicioCustom(
-  rutinaId: string,
-  nombre: string,
-  categoria: Categoria
-) {
+export async function reordenarEjercicios(rutinaId: string, idsEnOrden: string[]) {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
-
-  const { data, error } = await supabase
-    .from("ejercicios_custom")
-    .insert({ user_id: user!.id, nombre, categoria })
-    .select("id")
-    .single();
-
-  if (error || !data) return;
-
-  await agregarEjercicios(rutinaId, [{ id: data.id, nombre, esCustom: true }]);
+  await Promise.all(
+    idsEnOrden.map((id, orden) =>
+      supabase.from("rutina_ejercicios").update({ orden }).eq("id", id)
+    )
+  );
+  revalidatePath(`/rutinas/${rutinaId}`);
 }

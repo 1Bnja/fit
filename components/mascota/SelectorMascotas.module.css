@@ -1,0 +1,169 @@
+.lista {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  gap: 1rem;
+  padding: 0;
+  list-style: none;
+}
+
+.tarjeta {
+  --color-mascota: var(--accent);
+
+  position: relative;
+  display: flex;
+  height: 100%;
+  min-width: 0;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--color-mascota) 42%, var(--border));
+  border-radius: 1rem;
+  background:
+    radial-gradient(
+      circle at 50% 27%,
+      color-mix(in srgb, var(--color-mascota) 30%, transparent) 0,
+      transparent 43%
+    ),
+    linear-gradient(145deg, color-mix(in srgb, var(--color-mascota) 9%, transparent), transparent 52%),
+    var(--surface);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 5%);
+}
+
+.tarjeta[data-seleccionada] {
+  border-color: var(--color-mascota);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 8%),
+    0 0 1.25rem color-mix(in srgb, var(--color-mascota) 18%, transparent);
+}
+
+.retrato {
+  position: relative;
+  min-height: 14rem;
+  margin: 0.75rem 0.75rem 0;
+}
+
+.retrato::after {
+  position: absolute;
+  inset: auto 18% 5%;
+  height: 1.25rem;
+  border-radius: 50%;
+  background: rgb(0 0 0 / 38%);
+  content: "";
+  filter: blur(0.55rem);
+}
+
+.imagen {
+  z-index: 1;
+  padding: 1rem;
+  object-fit: contain;
+  filter: drop-shadow(0 0.5rem 0.65rem rgb(0 0 0 / 32%));
+}
+
+.sinImagen {
+  position: absolute;
+  z-index: 1;
+  inset: 50% auto auto 50%;
+  display: grid;
+  width: 5rem;
+  aspect-ratio: 1;
+  place-items: center;
+  border: 1px dashed color-mix(in srgb, var(--color-mascota) 65%, var(--border));
+  border-radius: 50%;
+  color: var(--muted);
+  font-size: 2rem;
+  transform: translate(-50%, -50%);
+}
+
+.contenido {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+}
+
+.encabezado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.nombre {
+  min-width: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.insignia {
+  flex-shrink: 0;
+  border: 1px solid color-mix(in srgb, var(--color-mascota) 65%, var(--border));
+  border-radius: 999px;
+  padding: 0.2rem 0.55rem;
+  color: color-mix(in srgb, var(--color-mascota) 72%, white);
+  font-size: 0.75rem;
+  line-height: 1;
+}
+
+.descripcion {
+  flex: 1;
+  color: var(--muted);
+  font-size: 0.875rem;
+  line-height: 1.45;
+}
+
+.boton {
+  width: 100%;
+  min-height: 2.75rem;
+  border: 1px solid color-mix(in srgb, var(--color-mascota) 66%, var(--border));
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, var(--color-mascota) 88%, #111);
+  padding: 0.625rem 0.85rem;
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition:
+    border-color 150ms ease,
+    filter 150ms ease,
+    transform 150ms ease;
+}
+
+.boton:hover:not(:disabled) {
+  filter: brightness(1.12);
+}
+
+.boton:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.boton:focus-visible {
+  outline: 2px solid white;
+  outline-offset: 2px;
+}
+
+.boton:disabled {
+  border-color: var(--border);
+  background: var(--surface-2);
+  color: var(--muted);
+  cursor: default;
+}
+
+.estadoVacio {
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  background: var(--surface);
+  padding: 1rem;
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+@media (max-width: 30rem) {
+  .retrato {
+    min-height: 12rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .boton {
+    transition: none;
+  }
+}
